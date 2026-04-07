@@ -21,7 +21,12 @@
 
         <div id="nav-sticky-wrapper" style="position:relative; z-index:50;">
             <div id="nav-sticky-inner" style="position:sticky; top:0; z-index:50;">
-                @livewire('navigation-bar')
+                <div class="block md:hidden">
+                    @livewire('navigation-bar')
+                </div>
+                <div class="hidden md:block">
+                    @livewire('compressed-navigation')
+                </div>
             </div>
         </div>
         @livewire('preview-section')
@@ -65,5 +70,6 @@
         </script>
 
         @livewireScripts
+        <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
     </body>
 </html>

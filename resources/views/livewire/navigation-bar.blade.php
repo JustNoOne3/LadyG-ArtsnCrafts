@@ -38,32 +38,32 @@
             </div>
         </div>
         <style>
-        @media (max-width: 767px) {
-            .carousel-viewport {
-                width: 100%;
-                overflow: hidden;
-                position: relative;
+            @media (max-width: 767px) {
+                .carousel-viewport {
+                    width: 100%;
+                    overflow: hidden;
+                    position: relative;
+                }
+                .carousel-row {
+                    display: flex;
+                    gap: 1rem;
+                    will-change: transform;
+                    transition: none;
+                }
+                .brand-carousel-item {
+                    flex: 0 0 33.33%;
+                    max-width: 33.33%;
+                    box-sizing: border-box;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    border: none !important;
+                }
+                .brand-carousel-item img {
+                    border-bottom: none !important;
+                    box-shadow: none !important;
+                }
             }
-            .carousel-row {
-                display: flex;
-                gap: 1rem;
-                will-change: transform;
-                transition: none;
-            }
-            .brand-carousel-item {
-                flex: 0 0 33.33%;
-                max-width: 33.33%;
-                box-sizing: border-box;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                border: none !important;
-            }
-            .brand-carousel-item img {
-                border-bottom: none !important;
-                box-shadow: none !important;
-            }
-        }
         </style>
         <div class="min-h-24 md:min-h-36 p-4 w-full flex justify-center">
             <div x-data="{ activeIdx: null }" class="w-full flex flex-col justify-center">
