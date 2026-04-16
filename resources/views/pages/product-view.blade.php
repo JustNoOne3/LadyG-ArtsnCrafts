@@ -16,6 +16,7 @@
         @livewireStyles
     </head>
     <body class="bg-white">
+        
         <div id="nav-sticky-wrapper" style="position:relative; z-index:50;">
             <div id="nav-sticky-inner" style="position:sticky; top:0; z-index:50;">
                 @livewire('compressed-navigation')
@@ -102,72 +103,74 @@
                 </div>
             </div>
         </div>
+        {{-- Footer --}}
+        @livewire('footer-section')
         @livewireScripts
     </body>
 </html>
 
 <script>
-        // Variant and subvariant logic
-        const variants = @json($variants);
-        const subvariants = @json($subvariants);
-        let selectedVariantId = null;
-        let selectedSubvariantId = null;
+    // Variant and subvariant logic
+    const variants = @json($variants);
+    const subvariants = @json($subvariants);
+    let selectedVariantId = null;
+    let selectedSubvariantId = null;
 
-        function selectVariant(variantId) {
-            selectedVariantId = variantId;
-            // Highlight selected variant
-            document.querySelectorAll('.variant-btn').forEach(btn => btn.classList.remove('border-[#8c370f]', 'border-2'));
-            const btn = document.getElementById('variant-btn-' + variantId);
-            if (btn) btn.classList.add('border-[#8c370f]', 'border-2');
+    function selectVariant(variantId) {
+        selectedVariantId = variantId;
+        // Highlight selected variant
+        document.querySelectorAll('.variant-btn').forEach(btn => btn.classList.remove('border-[#8c370f]', 'border-2'));
+        const btn = document.getElementById('variant-btn-' + variantId);
+        if (btn) btn.classList.add('border-[#8c370f]', 'border-2');
 
-            // Update price
-            const variant = variants.find(v => v.id == variantId);
-            if (variant && variant.variant_price) {
-                document.getElementById('dynamic-price').innerText = '₱' + Number(variant.variant_price).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2});
-            } else {
-                document.getElementById('dynamic-price').innerText = '₱' + Number(@json($product->product_price)).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2});
-            }
-
-            // Show subvariants for this variant
-            const subvarSection = document.getElementById('subvariant-section');
-            const subvarBtns = document.getElementById('subvariant-btns');
-            subvarBtns.innerHTML = '';
-            const filtered = subvariants.filter(sv => sv.subvar_variantId == variantId);
-            if (filtered.length) {
-                subvarSection.style.display = '';
-                filtered.forEach(subvar => {
-                    const btn = document.createElement('button');
-                    btn.type = 'button';
-                    btn.className = 'subvariant-btn border-2 border-transparent rounded-lg p-1 hover:border-[#8c370f] focus:border-[#8c370f] focus:outline-none';
-                    btn.style.background = '#f7ede3';
-                    btn.onclick = () => selectSubvariant(subvar.id);
-                    btn.id = 'subvariant-btn-' + subvar.id;
-                    btn.innerHTML = `<img src='${subvar.subvar_image ? '/storage/' + subvar.subvar_image : ''}' alt='${subvar.subvar_name}' class='w-12 h-12 object-cover rounded mb-1'><div class='text-xs text-[#8c370f]'>${subvar.subvar_name}</div>`;
-                    subvarBtns.appendChild(btn);
-                });
-            } else {
-                subvarSection.style.display = 'none';
-            }
-            // Keep variant border if subvariant is selected
-            if (selectedSubvariantId) {
-                const vbtn = document.getElementById('variant-btn-' + variantId);
-                if (vbtn) vbtn.classList.add('border-[#8c370f]', 'border-2');
-            }
+        // Update price
+        const variant = variants.find(v => v.id == variantId);
+        if (variant && variant.variant_price) {
+            document.getElementById('dynamic-price').innerText = '₱' + Number(variant.variant_price).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2});
+        } else {
+            document.getElementById('dynamic-price').innerText = '₱' + Number(@json($product->product_price)).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2});
         }
-        function selectSubvariant(subvarId) {
-            selectedSubvariantId = subvarId;
-            // Keep variant border
-            if (selectedVariantId) {
-                const vbtn = document.getElementById('variant-btn-' + selectedVariantId);
-                if (vbtn) vbtn.classList.add('border-[#8c370f]', 'border-2');
-            }
-            document.querySelectorAll('.subvariant-btn').forEach(btn => btn.classList.remove('border-[#8c370f]', 'border-2'));
-            const btn = document.getElementById('subvariant-btn-' + subvarId);
-            if (btn) btn.classList.add('border-[#8c370f]', 'border-2');
-            // Update price
-            const subvar = subvariants.find(sv => sv.id == subvarId);
-            if (subvar && subvar.subvar_price) {
-                document.getElementById('dynamic-price').innerText = '₱' + Number(subvar.subvar_price).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2});
-            }
+
+        // Show subvariants for this variant
+        const subvarSection = document.getElementById('subvariant-section');
+        const subvarBtns = document.getElementById('subvariant-btns');
+        subvarBtns.innerHTML = '';
+        const filtered = subvariants.filter(sv => sv.subvar_variantId == variantId);
+        if (filtered.length) {
+            subvarSection.style.display = '';
+            filtered.forEach(subvar => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'subvariant-btn border-2 border-transparent rounded-lg p-1 hover:border-[#8c370f] focus:border-[#8c370f] focus:outline-none';
+                btn.style.background = '#f7ede3';
+                btn.onclick = () => selectSubvariant(subvar.id);
+                btn.id = 'subvariant-btn-' + subvar.id;
+                btn.innerHTML = `<img src='${subvar.subvar_image ? '/storage/' + subvar.subvar_image : ''}' alt='${subvar.subvar_name}' class='w-12 h-12 object-cover rounded mb-1'><div class='text-xs text-[#8c370f]'>${subvar.subvar_name}</div>`;
+                subvarBtns.appendChild(btn);
+            });
+        } else {
+            subvarSection.style.display = 'none';
         }
-    </script>
+        // Keep variant border if subvariant is selected
+        if (selectedSubvariantId) {
+            const vbtn = document.getElementById('variant-btn-' + variantId);
+            if (vbtn) vbtn.classList.add('border-[#8c370f]', 'border-2');
+        }
+    }
+    function selectSubvariant(subvarId) {
+        selectedSubvariantId = subvarId;
+        // Keep variant border
+        if (selectedVariantId) {
+            const vbtn = document.getElementById('variant-btn-' + selectedVariantId);
+            if (vbtn) vbtn.classList.add('border-[#8c370f]', 'border-2');
+        }
+        document.querySelectorAll('.subvariant-btn').forEach(btn => btn.classList.remove('border-[#8c370f]', 'border-2'));
+        const btn = document.getElementById('subvariant-btn-' + subvarId);
+        if (btn) btn.classList.add('border-[#8c370f]', 'border-2');
+        // Update price
+        const subvar = subvariants.find(sv => sv.id == subvarId);
+        if (subvar && subvar.subvar_price) {
+            document.getElementById('dynamic-price').innerText = '₱' + Number(subvar.subvar_price).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2});
+        }
+    }
+</script>

@@ -49,15 +49,19 @@
                         class="grid grid-cols-3 grid-rows-3 md:grid-cols-5 md:grid-rows-auto gap-4 items-center justify-center max-w-full lg:flex lg:flex-row lg:items-center lg:gap-2 lg:overflow-x-visible p-4"
                         style="min-width: 0;"
                     >
+                        @php
+                            $currentBrandId = request()->routeIs('shop.view') ? request()->route('id') : null;
+                        @endphp
                         @foreach(App\Models\Brand::select('id', 'brand_logo')->get() as $idx => $brand)
-                            <div class="flex block justify-center items-center min-w-0" @click="activeIdx = {{ $idx }}">
-                                <img 
-                                    src="{{ asset('storage/' . $brand->brand_logo) }}" 
-                                    alt="{{ $brand->brand_name }} Logo" 
-                                    :class="activeIdx === {{ $idx }} ? 'border-2 rounded-xl border-[#8c370f] rounded-full' : ''"
-                                    class="h-20 w-auto object-contain max-w-[100px] lg:h-32 md:max-w-[120px] transition-transform duration-300 ease-in-out hover:scale-125 box-border"
-                                    style="max-width: 100%; min-width: 0;"
-                                >
+                            <div class="flex block justify-center items-center min-w-0">
+                                <a href="{{ route('shop.view', ['id' => $brand->id]) }}" style="display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;">
+                                    <img 
+                                        src="{{ asset('storage/' . $brand->brand_logo) }}" 
+                                        alt="{{ $brand->brand_name }} Logo" 
+                                        class="h-20 w-auto object-contain max-w-[100px] lg:h-32 md:max-w-[120px] transition-transform duration-300 ease-in-out hover:scale-125 box-border {{ (string)$brand->id === (string)$currentBrandId ? 'border-2 rounded-xl border-[#8c370f] rounded-full' : '' }}"
+                                        style="max-width: 100%; min-width: 0;"
+                                    >
+                                </a>
                             </div>
                         @endforeach
                     </div>

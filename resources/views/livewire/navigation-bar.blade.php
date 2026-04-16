@@ -67,7 +67,7 @@
         </style>
         <div class="min-h-24 md:min-h-36 p-4 w-full flex justify-center">
             <div x-data="{ activeIdx: null }" class="w-full flex flex-col justify-center">
-                <!-- Mobile 2-row carousel -->
+                {{-- Mobile 2-row carousel --}}
                 <div class="w-full md:hidden space-y-2">
                     @php
                         $brands = App\Models\Brand::select('id', 'brand_logo', 'brand_name')->get();
@@ -77,22 +77,26 @@
                         <div class="carousel-row" :style="`transform: translateX(${translate}px)`" x-ref="row">
                             @foreach($brands as $brand)
                                 <div class="brand-carousel-item">
-                                    <img 
-                                        src="{{ asset('storage/' . $brand->brand_logo) }}" 
-                                        alt="{{ $brand->brand_name }} Logo" 
-                                        class="h-20 w-auto object-contain max-w-[100px] transition-transform duration-300 ease-in-out hover:scale-125 box-border"
-                                        style="max-width: 100%; min-width: 0;"
-                                    >
+                                    <a href="{{ route('shop.view', ['id' => $brand->id]) }}" style="display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;">
+                                        <img 
+                                            src="{{ asset('storage/' . $brand->brand_logo) }}" 
+                                            alt="{{ $brand->brand_name }} Logo" 
+                                            class="h-20 w-auto object-contain max-w-[100px] transition-transform duration-300 ease-in-out hover:scale-125 box-border"
+                                            style="max-width: 100%; min-width: 0;"
+                                        >
+                                    </a>
                                 </div>
                             @endforeach
                             @foreach($brands as $brand)
                                 <div class="brand-carousel-item">
-                                    <img 
-                                        src="{{ asset('storage/' . $brand->brand_logo) }}" 
-                                        alt="{{ $brand->brand_name }} Logo" 
-                                        class="h-20 w-auto object-contain max-w-[100px] transition-transform duration-300 ease-in-out hover:scale-125 box-border"
-                                        style="max-width: 100%; min-width: 0;"
-                                    >
+                                    <a href="{{ route('shop.view', ['id' => $brand->id]) }}" style="display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;">
+                                        <img 
+                                            src="{{ asset('storage/' . $brand->brand_logo) }}" 
+                                            alt="{{ $brand->brand_name }} Logo" 
+                                            class="h-20 w-auto object-contain max-w-[100px] transition-transform duration-300 ease-in-out hover:scale-125 box-border"
+                                            style="max-width: 100%; min-width: 0;"
+                                        >
+                                    </a>
                                 </div>
                             @endforeach
                         </div>
@@ -121,20 +125,23 @@
                             }
                         }
                     </script>
+                {{-- Large Screen 1-row Nav --}}
                 <div class="w-full overflow-x-auto md:overflow-x-visible scrollbar-thin scrollbar-thumb-[#D19658] scrollbar-track-[#f8f8f8] hidden md:block">
                     <div
                         class="grid grid-cols-3 grid-rows-3 md:grid-cols-5 md:grid-rows-auto gap-4 items-center justify-center max-w-full lg:flex lg:flex-row lg:items-center lg:gap-2 lg:overflow-x-visible p-4"
                         style="min-width: 0;"
                     >
                         @foreach($brands as $idx => $brand)
-                            <div class="flex block justify-center items-center min-w-0" @click="activeIdx = {{ $idx }}">
-                                <img 
-                                    src="{{ asset('storage/' . $brand->brand_logo) }}" 
-                                    alt="{{ $brand->brand_name }} Logo" 
-                                    :class="activeIdx === {{ $idx }} ? 'border-2 rounded-xl border-[#8c370f] rounded-full' : ''"
-                                    class="h-20 w-auto object-contain max-w-[100px] lg:h-32 md:max-w-[120px] transition-transform duration-300 ease-in-out hover:scale-125 box-border"
-                                    style="max-width: 100%; min-width: 0;"
-                                >
+                            <div class="flex block justify-center items-center min-w-0">
+                                <a href="{{ route('shop.view', ['id' => $brand->id]) }}" style="display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;">
+                                    <img 
+                                        src="{{ asset('storage/' . $brand->brand_logo) }}" 
+                                        alt="{{ $brand->brand_name }} Logo" 
+                                        :class="activeIdx === {{ $idx }} ? 'border-2 rounded-xl border-[#8c370f] rounded-full' : ''"
+                                        class="h-20 w-auto object-contain max-w-[100px] lg:h-32 md:max-w-[120px] transition-transform duration-300 ease-in-out hover:scale-125 box-border"
+                                        style="max-width: 100%; min-width: 0;"
+                                    >
+                                </a>
                             </div>
                         @endforeach
                     </div>

@@ -67,8 +67,14 @@ Route::get('/products', function (Request $request) {
     return response()->json($products);
 });
 
+
 Route::get('/brands', function () {
     return Brand::all();
+});
+
+Route::get('/brands/{id}', function ($id) {
+    $brand = Brand::findOrFail($id);
+    return response()->json($brand);
 });
 
 Route::get('/categories', function () {

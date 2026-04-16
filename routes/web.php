@@ -73,3 +73,6 @@ Route::get('/product/{id}', function ($id) {
     return view('pages.product-view', compact('product', 'images', 'mainImage', 'variants', 'subvariants'));
 })->name('product.view');
 
+Route::get('/shop/{id}', function($id) {
+    return view('pages.shop-view', compact('id'));
+})->name('shop.view');
