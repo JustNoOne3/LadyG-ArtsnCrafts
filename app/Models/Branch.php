@@ -11,6 +11,9 @@ class Branch extends Model
     protected $fillable = [
         'branch_name', 
         'branch_address', 
+        'branch_contact',
+        'branch_email',
+        'branch_mapLink',
         'branch_brands'
     ];
 

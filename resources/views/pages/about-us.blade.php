@@ -28,7 +28,7 @@
             >
             <a class="hover:underline" href="Home">About Us</a>
         </div>
-        <!-- Vue Brand Section -->
+        @livewire('aboutus-section')
         
         {{-- Footer --}}
         @livewire('footer-section')

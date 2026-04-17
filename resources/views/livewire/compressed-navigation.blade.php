@@ -13,13 +13,13 @@
             <div class="hidden md:block">
                 <ul class="flex items-center gap-6 text-lg justify-center">
                     <li>
-                        <a class="text-[#8c370f] hover:text-[#BA4B18] transition" href="#About"> About Us </a>
+                        <a class="text-[#8c370f] hover:text-[#BA4B18] transition" href="/about-us"> About Us </a>
                     </li>
                     <li>
                         <a class="text-[#8c370f]"> | </a>
                     </li>
                     <li>
-                        <a class="text-[#8c370f] hover:text-[#BA4B18] transition" href="#Partners"> Log in or Create an Account </a>
+                        <a class="text-[#8c370f] hover:text-[#BA4B18] transition" href="/login"> Log in or Create an Account </a>
                     </li>
                 </ul>
             </div>

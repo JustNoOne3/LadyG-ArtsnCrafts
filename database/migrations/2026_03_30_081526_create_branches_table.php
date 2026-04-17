@@ -15,6 +15,9 @@ return new class extends Migration
             $table->id();
             $table->string('branch_name')->nullable();
             $table->string('branch_address')->nullable();
+            $table->string('branch_contact')->nullable();
+            $table->string('branch_email')->nullable();
+            $table->string('branch_mapLink')->nullable();
             $table->text('branch_brands')->nullable();
             $table->timestamps();
         });

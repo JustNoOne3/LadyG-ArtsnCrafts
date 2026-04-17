@@ -3,11 +3,15 @@
 namespace App\Livewire;
 
 use Livewire\Component;
+use App\Models\Footer;
+use App\Models\Branch;
 
 class FooterSection extends Component
 {
     public function render()
     {
-        return view('livewire.footer-section');
+        $footer = Footer::first();
+        $branches = Branch::all();
+        return view('livewire.footer-section', compact('footer', 'branches'));
     }
 }

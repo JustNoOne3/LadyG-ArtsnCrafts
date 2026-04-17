@@ -8,6 +8,9 @@ use Lab404\Impersonate\Services\ImpersonateManager;
 use App\Models\Product;
 use App\Models\Variant;
 use App\Models\VariantSub;
+use Laravel\Socialite\Facades\Socialite;
+use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 
 /*
 |--------------------------------------------------------------------------
@@ -76,3 +79,33 @@ Route::get('/product/{id}', function ($id) {
 Route::get('/shop/{id}', function($id) {
     return view('pages.shop-view', compact('id'));
 })->name('shop.view');
+
+Route::get('/about-us', function() {
+    return view('pages.about-us');
+})->name('about-us');
+
+Route::get('/login', function() {
+    return view('auth.login-pg');
+})->name('login');
+
+Route::get('/signup', function() {
+    return view('auth.sign-up');
+})->name('signup');
+
+// Google OAuth Redirect
+Route::get('/auth/redirect/{provider}', function ($provider) {
+    return Socialite::driver($provider)->redirect();
+})->name('socialite.redirect');
+
+// Google OAuth Callback
+Route::get('/auth/callback/{provider}', function ($provider) {
+    $socialUser = Socialite::driver($provider)->stateless()->user();
+    $user = User::firstOrCreate([
+        'email' => $socialUser->getEmail(),
+    ], [
+        'name' => $socialUser->getName() ?? $socialUser->getNickname() ?? $socialUser->getEmail(),
+        'password' => '', // No password for social users
+    ]);
+    Auth::login($user);
+    return redirect()->intended('/');
+})->name('socialite.callback');
