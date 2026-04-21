@@ -31,6 +31,7 @@
             </div>
         </header>
 
+{{dd(auth()->user())}}
         <div class="w-full h-screen bg-[#e6d9cb] flex items-center justify-center">
             <div class="w-1/2 h-auto min-h-96 bg-white rounded-lg shadow-lg flex flex-col items-center justify-center p-8">
                 <span class="text-2xl font-bold text-[#7a4025]">Welcome to LadyG Arts & Crafts</span>
@@ -41,4 +42,5 @@
         
         {{-- Footer --}}
         @livewire('footer-section')
+        @livewireScripts
     </body>

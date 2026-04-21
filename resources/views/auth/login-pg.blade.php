@@ -1,3 +1,4 @@
+    
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
@@ -35,7 +36,7 @@
             <div class="w-1/2 h-auto min-h-96 bg-white rounded-lg shadow-lg flex flex-col items-center justify-center p-8">
                 <span class="text-2xl font-bold text-[#7a4025]">Welcome to LadyG Arts & Crafts</span>
                 <span class="text-lg text-[#7a4025]">Please log in to continue</span>
-                
+                    @include('auth.partials.login-form')
 
             </div>
         </div>

@@ -1,4 +1,16 @@
 <form wire:submit.prevent="register" class="w-full max-w-md mx-auto flex flex-col gap-4 mt-8">
+    <div class="flex flex-row justify-between">
+        <div>
+            <label for="fname" class="block text-sm font-medium text-gray-700">First Name</label>
+            <input type="text" id="fname" wire:model.defer="fname" class="mt-1 block w-full rounded border-gray-300 shadow-sm focus:border-[#7a4025] focus:ring-[#7a4025]" required>
+            @error('fname') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+        </div>
+        <div>
+            <label for="lname" class="block text-sm font-medium text-gray-700">Last Name</label>
+            <input type="text" id="lname" wire:model.defer="lname" class="mt-1 block w-full rounded border-gray-300 shadow-sm focus:border-[#7a4025] focus:ring-[#7a4025]" required>
+            @error('lname') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+        </div>
+    </div>
     <div>
         <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
         <input type="email" id="email" wire:model.defer="email" class="mt-1 block w-full rounded border-gray-300 shadow-sm focus:border-[#7a4025] focus:ring-[#7a4025]" required>
@@ -13,7 +25,15 @@
         <label for="password_confirmation" class="block text-sm font-medium text-gray-700">Confirm Password</label>
         <input type="password" id="password_confirmation" wire:model.defer="password_confirmation" class="mt-1 block w-full rounded border-gray-300 shadow-sm focus:border-[#7a4025] focus:ring-[#7a4025]" required>
     </div>
-    <button type="submit" class="bg-[#7a4025] text-white py-2 rounded hover:bg-[#63321c] font-semibold">Sign Up</button>
+    <button type="submit" class="bg-[#7a4025] text-white py-2 rounded hover:bg-[#63321c] font-semibold flex items-center justify-center gap-2" @if($isLoading) disabled @endif>
+        <span wire:loading wire:target="register">
+            <svg class="animate-spin h-5 w-5 mr-2 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+            </svg>
+        </span>
+        <span>Sign Up</span>
+    </button>
     <div class="flex items-center justify-center mt-4">
         <span class="text-gray-500 text-sm">or</span>
     </div>
@@ -24,3 +44,12 @@
         </a>
     </div>
 </form>
+@if($showWelcomeModal)
+    <div class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+        <div class="bg-white rounded-lg shadow-lg p-8 max-w-sm w-full text-center">
+            <h2 class="text-2xl font-bold mb-4 text-[#7a4025]">Welcome to LadyG Arts & Crafts</h2>
+            <p class="mb-6 text-gray-700">Your account has been created successfully!</p>
+            <button wire:click="redirectToHome" class="bg-[#7a4025] text-white px-6 py-2 rounded hover:bg-[#63321c] font-semibold w-full">Go to Home</button>
+        </div>
+    </div>
+@endif

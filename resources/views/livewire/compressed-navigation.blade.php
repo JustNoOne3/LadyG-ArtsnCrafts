@@ -19,7 +19,22 @@
                         <a class="text-[#8c370f]"> | </a>
                     </li>
                     <li>
-                        <a class="text-[#8c370f] hover:text-[#BA4B18] transition" href="/login"> Log in or Create an Account </a>
+                        @if(auth()->user())
+                            <a href="#" class="text-[#8c370f] hover:text-[#BA4B18] transition" onclick="event.preventDefault(); document.getElementById('logout-modal').classList.remove('hidden');">Log out</a>
+                        @else
+                            <a class="text-[#8c370f] hover:text-[#BA4B18] transition" href="/login">Log in or Create an Account  </a>
+                        @endif
+                    <!-- Logout Confirmation Modal -->
+                    <div id="logout-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+                        <div class="bg-white rounded-lg shadow-lg p-8 max-w-sm w-full text-center">
+                            <h2 class="text-2xl font-bold mb-4 text-[#7a4025]">Confirm Logout</h2>
+                            <p class="mb-6 text-gray-700">Are you sure you want to log out?</p>
+                            <div class="flex gap-4 justify-center">
+                                <a href="/logout" class="bg-[#7a4025] text-white px-6 py-2 rounded hover:bg-[#63321c] font-semibold">Yes, Log out</a>
+                                <button onclick="document.getElementById('logout-modal').classList.add('hidden');" class="bg-gray-300 text-gray-700 px-6 py-2 rounded hover:bg-gray-400 font-semibold">Cancel</button>
+                            </div>
+                        </div>
+                    </div>
                     </li>
                 </ul>
             </div>
