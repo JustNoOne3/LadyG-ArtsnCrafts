@@ -10,7 +10,7 @@
         <input type="password" id="password" name="password" class="mt-1 block w-full rounded border-gray-300 shadow-sm focus:border-[#7a4025] focus:ring-[#7a4025]" required>
         @error('password') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
     </div>
-    <button type="submit" class="bg-[#7a4025] text-white py-2 rounded hover:bg-[#63321c] font-semibold">Log In</button>
+    <x-filament::button type="submit" class="bg-[#7a4025] text-white py-2 rounded hover:bg-[#63321c] font-semibold">Log In</x-filament::button>
     <div class="flex items-center justify-center mt-4">
         <span class="text-gray-500 text-sm">or</span>
     </div>

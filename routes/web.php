@@ -109,7 +109,7 @@ Route::post('/login', function (Request $request) {
     ])->onlyInput('email');
 });
 
-Route::get('/logout', function () {
+Route::post('/logout', function () {
     \Auth::logout();
     request()->session()->invalidate();
     request()->session()->regenerateToken();

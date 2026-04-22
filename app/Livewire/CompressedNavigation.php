@@ -10,4 +10,9 @@ class CompressedNavigation extends Component
     {
         return view('livewire.compressed-navigation');
     }
+
+    public function logoutModal()
+    {
+        $this->dispatch('open-modal', id: 'logout-modal');
+    }
 }
