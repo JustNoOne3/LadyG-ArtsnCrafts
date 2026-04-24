@@ -11,6 +11,7 @@ use App\Models\VariantSub;
 use Laravel\Socialite\Facades\Socialite;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
 
 /*
 |--------------------------------------------------------------------------
@@ -24,8 +25,11 @@ use Illuminate\Support\Facades\Auth;
 */
 
 Route::get('/', function () {
+    // dd(auth()->user());
     return view('welcome');
-})->name('home');
+})
+    ->middleware('web')
+    ->name('home');
 
 
 
@@ -88,6 +92,30 @@ Route::get('/login', function() {
     return view('auth.login-pg');
 })->name('login');
 
+// Handle login POST
+Route::post('/login', function (Request $request) {
+    $credentials = $request->validate([
+        'email' => ['required', 'email'],
+        'password' => ['required'],
+    ]);
+
+    if (Auth::attempt($credentials, $request->boolean('remember'))) {
+        $request->session()->regenerate();
+        return redirect()->intended('/');
+    }
+
+    return back()->withErrors([
+        'email' => 'The provided credentials do not match our records.',
+    ])->onlyInput('email');
+});
+
+Route::post('/logout', function () {
+    \Auth::logout();
+    request()->session()->invalidate();
+    request()->session()->regenerateToken();
+    return redirect('/');
+})->name('logout')->middleware('web');
+
 Route::get('/signup', function() {
     return view('auth.sign-up');
 })->name('signup');
@@ -104,7 +132,7 @@ Route::get('/auth/callback/{provider}', function ($provider) {
         'email' => $socialUser->getEmail(),
     ], [
         'name' => $socialUser->getName() ?? $socialUser->getNickname() ?? $socialUser->getEmail(),
-        'password' => '', // No password for social users
+        'password' => '',
     ]);
     Auth::login($user);
     return redirect()->intended('/');

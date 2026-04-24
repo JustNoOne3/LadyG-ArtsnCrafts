@@ -19,13 +19,22 @@
                         <a class="text-[#8c370f]"> | </a>
                     </li>
                     <li>
-                        <a class="text-[#8c370f] hover:text-[#BA4B18] transition" href="/login"> Log in or Create an Account </a>
+                        @if(auth()->user())
+                            @livewire('logout-modal')
+                        @else
+                            <a class="text-[#8c370f] hover:text-[#BA4B18] transition" href="/login">Log in or Create an Account  </a>
+                        @endif
                     </li>
+                    
                 </ul>
             </div>
             <!-- Mobile nav: login & cart right -->
             <div class="flex items-center gap-2 md:hidden">
-                <a class="text-[#8c370f] text-sm px-2 py-1 rounded hover:text-[#BA4B18]" href="#Partners">Login</a>
+                @if(auth()->user())
+                    @livewire('logout-modal')
+                @else
+                    <a class="text-[#8c370f] text-sm px-2 py-1 rounded hover:text-[#BA4B18]" href="#Partners">Login</a>
+                @endif
                 <a class="block text-teal-600" href="#">
                     <x-bi-cart3 class="w-8 h-8 text-[#8c370f] hover:text-[#BA4B18]" />
                 </a>
@@ -70,3 +79,4 @@
         </div>
     </div>
 </header>
+

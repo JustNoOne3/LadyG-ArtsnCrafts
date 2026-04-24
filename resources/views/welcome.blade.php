@@ -26,11 +26,11 @@
                 </div>
             </div>
         </div>
-        <div id="loadingScreen" class="fixed inset-0 z-50 flex items-center justify-center bg-[#FAF5F0] transition-opacity duration-700 h-screen w-screen">
+        {{-- <div id="loadingScreen" class="fixed inset-0 z-50 flex items-center justify-center bg-[#FAF5F0] transition-opacity duration-700 h-screen w-screen">
             <div class="flex flex-col justify-center items-center w-full h-full">
                 <x-lottie path="{{asset('animations/LadyG.json')}}" loop="true" autoplay="true" class="mx-auto w-auto h-96" />
             </div>
-        </div>
+        </div> --}}
         <script>
             window.addEventListener('DOMContentLoaded', function() {
                 // Always scroll to top on page load
