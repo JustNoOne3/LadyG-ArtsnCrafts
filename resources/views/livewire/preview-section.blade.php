@@ -3,9 +3,9 @@
         <div class="w-full grid grid-cols-3 md:grid-cols-4 justify-center items-center px-2 md:px-8 pt-0 md:pt-2 md:mb-8 h-full">
             @foreach($leftProducts as $i => $product)
                 @if($i < 3 || (request()->isNotFilled('mobile') && $i < 4))
-                <div class="flex flex-col items-start {{ $i >= 3 ? 'hidden md:flex' : '' }}">
-                    <img src="{{ asset('storage/' . $product->product_thumbnail) }}" alt="{{ $product->product_name }}" class="w-58 h-28 md:h-48 object-cover bg-[#E6DFD8] rounded shadow-md md:mb-1">
-                    <span class="hidden md:block font-semibold text-[#7a4025] text-left">{{ $product->product_name }}</span>
+                <div class="flex flex-col items-start w-58 {{ $i >= 3 ? 'hidden md:flex' : '' }}">
+                    <img src="{{ asset('storage/' . $product->product_thumbnail) }}" alt="{{ $product->product_name }}" class="w-full h-28 md:h-48 object-cover bg-[#E6DFD8] rounded shadow-md md:mb-1">
+                    <span class="px-2 hidden md:block font-semibold text-[#7a4025] text-left w-full truncate">{{ $product->product_name }}</span>
                     {{-- <span class="hidden md:block text-xs text-[#7a4025] text-left">Price: ₱{{ number_format($product->product_price, 2) }}</span> --}}
                 </div>
                 @endif
@@ -23,9 +23,9 @@
         <div class="w-full grid grid-cols-3 md:grid-cols-4 justify-center items-center pl-2 md:pl-12 pt-0 md:pt-2 md:mb-8 h-full">
             @foreach($rightProducts as $i => $product)
                 @if($i < 3 || (request()->isNotFilled('mobile') && $i < 4))
-                <div class="flex flex-col items-start {{ $i >= 3 ? 'hidden md:flex' : '' }}">
-                    <img src="{{ asset('storage/' . $product->product_thumbnail) }}" alt="{{ $product->product_name }}" class="w-58 h-28 md:h-48 object-cover bg-[#E6DFD8] rounded shadow-md md:mb-1">
-                    <span class="hidden md:block font-semibold text-[#7a4025] text-left">{{ $product->product_name }}</span>
+                <div class="flex flex-col items-start w-58 {{ $i >= 3 ? 'hidden md:flex' : '' }}">
+                    <img src="{{ asset('storage/' . $product->product_thumbnail) }}" alt="{{ $product->product_name }}" class="w-full h-28 md:h-48 object-cover bg-[#E6DFD8] rounded shadow-md md:mb-1">
+                    <span class="px-2 hidden md:block font-semibold text-[#7a4025] text-left w-full truncate">{{ $product->product_name }}</span>
                     {{-- <span class="hidden md:block text-xs text-[#7a4025] text-left">Price: ₱{{ number_format($product->product_price, 2) }}</span> --}}
                 </div>
                 @endif

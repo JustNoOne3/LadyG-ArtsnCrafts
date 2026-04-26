@@ -1,5 +1,5 @@
 <?php
-
+require_once __DIR__.'/api-cart.php';
 use App\Livewire\SuperDuper\BlogList;
 use App\Livewire\SuperDuper\BlogDetails;
 use App\Livewire\SuperDuper\Pages\ContactUs;
@@ -12,6 +12,12 @@ use Laravel\Socialite\Facades\Socialite;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+use App\Models\Cart;
+use App\Models\ShippingOptions;
+use App\Models\PaymentDetails;
+use App\Http\Controllers\ShippingDetailsController;
+use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\FileUploadController;
 
 /*
 |--------------------------------------------------------------------------
@@ -90,7 +96,9 @@ Route::get('/about-us', function() {
 
 Route::get('/login', function() {
     return view('auth.login-pg');
-})->name('login');
+})
+->middleware('guest')
+->name('login');
 
 // Handle login POST
 Route::post('/login', function (Request $request) {
@@ -118,12 +126,16 @@ Route::post('/logout', function () {
 
 Route::get('/signup', function() {
     return view('auth.sign-up');
-})->name('signup');
+})
+->middleware('guest')
+->name('signup');
 
 // Google OAuth Redirect
 Route::get('/auth/redirect/{provider}', function ($provider) {
     return Socialite::driver($provider)->redirect();
-})->name('socialite.redirect');
+})
+->middleware('guest')
+->name('socialite.redirect');
 
 // Google OAuth Callback
 Route::get('/auth/callback/{provider}', function ($provider) {
@@ -137,3 +149,150 @@ Route::get('/auth/callback/{provider}', function ($provider) {
     Auth::login($user);
     return redirect()->intended('/');
 })->name('socialite.callback');
+
+
+// AJAX endpoint for adding to cart
+Route::post('/cart/add', function(Request $request) {
+    $validated = $request->validate([
+        'product_id' => 'required|integer|exists:products,id',
+        'variant_id' => 'nullable|integer',
+        'subvariant_id' => 'nullable|integer',
+        'quantity' => 'required|integer|min:1',
+    ]);
+    if (!auth()->check()) {
+        return response()->json(['error' => 'Unauthorized'], 401);
+    }
+    Cart::create([
+        'cart_user' => auth()->id(),
+        'cart_product' => $validated['product_id'],
+        'cart_variant' => $validated['variant_id'],
+        'cart_subVariant' => $validated['subvariant_id'],
+        'cart_quantity' => $validated['quantity'],
+    ]);
+    return response()->json(['success' => true]);
+})->name('cart.add');
+
+Route::get('/cart/view', function() {
+    return view('pages.cart');
+})->name('cart.view');
+
+
+// Authenticated AJAX endpoint for fetching cart items
+Route::get('/api/cart/items', function(Request $request) {
+    if (!Auth::check()) {
+        return response()->json(['error' => 'Unauthorized'], 401);
+    }
+    $cartItems = Cart::where('cart_user', Auth::id())
+        ->with([
+            'product:id,product_name,product_thumbnail,product_price',
+            'variant:id,variant_name',
+            'subvariant:id,subvar_name,subvar_price',
+        ])->get()->map(function($item) {
+            $price = $item->subvariant && $item->subvariant->subvar_price !== null
+                ? $item->subvariant->subvar_price
+                : ($item->product->product_price ?? 0);
+            return [
+                'id' => $item->id,
+                'product_name' => $item->product->product_name ?? '',
+                'product_thumbnail' => $item->product->product_thumbnail ?? '',
+                'product_price' => $price,
+                'variant_name' => $item->variant->variant_name ?? '',
+                'subvariant_name' => $item->subvariant->subvar_name ?? '',
+                'quantity' => $item->cart_quantity,
+            ];
+        });
+    return response()->json($cartItems);
+})->middleware(['web', 'auth']);
+
+// POST: Receive selected cart item IDs, store in session, redirect to checkout
+Route::post('/cart/checkout', function(Request $request) {
+    $ids = $request->input('selected', []);
+    if (!is_array($ids) || empty($ids)) {
+        return redirect()->route('cart.view')->with('error', 'No items selected for checkout.');
+    }
+    // Store selected cart item IDs in session
+    session(['checkout_cart_ids' => $ids]);
+    return redirect()->route('checkout.page');
+})->middleware(['web', 'auth'])->name('cart.checkout');
+
+// GET: Show checkout page with selected items, shipping options, and payment details
+Route::get('/checkout', function() {
+    $ids = session('checkout_cart_ids', []);
+    if (empty($ids)) {
+        return redirect()->route('cart.view')->with('error', 'No items selected for checkout.');
+    }
+    $cartItems = Cart::whereIn('id', $ids)
+        ->where('cart_user', Auth::id())
+        ->with([
+            'product:id,product_name,product_thumbnail,product_price',
+            'variant:id,variant_name',
+            'subvariant:id,subvar_name,subvar_price',
+        ])->get()->map(function($item) {
+            $price = $item->subvariant && $item->subvariant->subvar_price !== null
+                ? $item->subvariant->subvar_price
+                : ($item->product->product_price ?? 0);
+            return [
+                'id' => $item->id,
+                'product_name' => $item->product->product_name ?? '',
+                'product_thumbnail' => $item->product->product_thumbnail ?? '',
+                'product_price' => $price,
+                'variant_name' => $item->variant->variant_name ?? '',
+                'subvariant_name' => $item->subvariant->subvar_name ?? '',
+                'quantity' => $item->cart_quantity,
+            ];
+        })->values();
+
+    $shippingOptions = ShippingOptions::all();
+    $paymentDetails = PaymentDetails::all();
+
+    return view('pages.checkout', [
+        'checkoutItems' => $cartItems,
+        'shippingOptions' => $shippingOptions,
+        'paymentDetails' => $paymentDetails,
+    ]);
+})->middleware(['web', 'auth'])->name('checkout.page');
+
+
+// AJAX: Save shipping address
+Route::post('/shipping-details/save', [ShippingDetailsController::class, 'save'])->middleware(['web', 'auth']);
+// AJAX: List shipping addresses
+Route::get('/shipping-details/list', [ShippingDetailsController::class, 'list'])->middleware(['web', 'auth']);
+// AJAX: Update shipping address
+Route::post('/shipping-details/update', [ShippingDetailsController::class, 'update'])->middleware(['web', 'auth']);
+
+Route::post('/checkout/submit', [CheckoutController::class, 'submit'])->name('checkout.submit')->middleware('auth');
+
+Route::post('/file-upload/tmp', [FileUploadController::class, 'tmpUpload'])->middleware(['web', 'auth']);
+
+// Checkout success page
+Route::get('/checkout/success/{order}', function($orderId) {
+    $order = \App\Models\Order::findOrFail($orderId);
+    $shippingOption = null;
+    if ($order->order_shippingMethod) {
+        $shippingOption = \DB::table('shipping_options')->where('id', $order->order_shippingMethod)->first();
+    }
+    $shippingDetails = null;
+    if ($order->order_shippingAddress) {
+        $shippingDetails = \App\Models\ShippingDetails::find($order->order_shippingAddress);
+    }
+    return view('pages.checkout-success', [
+        'order' => $order,
+        'shippingOption' => $shippingOption,
+        'shippingDetails' => $shippingDetails,
+    ]);
+})->name('checkout.success')->middleware('auth');
+
+Route::get('my-orders', function() {
+    $orders = \App\Models\Order::where('order_userId', Auth::id())->orderByDesc('created_at')->get();
+    return view('pages.my-orders', compact('orders'));
+})->name('my-orders')->middleware('auth');
+
+// My Orders page
+Route::get('/my-orders', function() {
+    $orders = \App\Models\Order::where('order_userId', auth()->id())
+        ->orderByDesc('created_at')
+        ->get();
+    return view('pages.my-orders', [
+        'orders' => $orders
+    ]);
+})->name('my-orders')->middleware('auth');

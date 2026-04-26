@@ -10,4 +10,10 @@ class LogoutModal extends Component
     {
         return view('livewire.logout-modal');
     }
+
+    public function closeModal()
+    {
+        $this->dispatch('close-modal', id: 'logout-modal');
+    }
+    
 }

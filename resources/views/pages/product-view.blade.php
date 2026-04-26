@@ -91,10 +91,17 @@
                     </div>
 
                     <div class="mt-6 flex gap-4">
-                        <button class="flex items-center gap-4 px-6 py-3 rounded-lg shadow-lg bg-[#8c370f] text-white font-semibold text-sm md:text-lg hover:bg-[#63321c] transition">
+                        <button id="add-to-cart-btn" type="button" class="flex items-center gap-4 px-6 py-3 rounded-lg shadow-lg bg-[#8c370f] text-white font-semibold text-sm md:text-lg hover:bg-[#63321c] transition">
                             <x-bi-cart3 class="hidden md:block w-6 h-6 text-white " />
                             Add to Cart
                         </button>
+                        <!-- Success Modal -->
+                        <div id="cart-success-modal" style="display:none;" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+                            <div class="bg-white rounded-lg shadow-lg p-8 max-w-md w-full text-center">
+                                <h2 class="text-2xl font-bold mb-4 text-[#7a4025]">Successfully added to cart!</h2>
+                                <button onclick="location.reload()" class="bg-[#7a4025] text-white px-6 py-2 rounded hover:bg-[#63321c] font-semibold w-full mt-4">Continue Shopping</button>
+                            </div>
+                        </div>
                         <button class="flex items-center gap-4 px-6 py-3 rounded-lg shadow-lg border-2 border-[#7a4025] text-[#7a4025] font-semibold text-sm md:text-lg hover:bg-[#63321c] transition">
                             <x-bi-bag-check class="hidden md:block w-6 h-6 text-[#7a4025]" />
                             Buy Now
@@ -115,6 +122,41 @@
     const subvariants = @json($subvariants);
     let selectedVariantId = null;
     let selectedSubvariantId = null;
+
+    // Add to Cart AJAX logic
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('add-to-cart-btn').addEventListener('click', function() {
+            const productId = {{ $product->id }};
+            const variantId = selectedVariantId;
+            const subvariantId = selectedSubvariantId;
+            const quantity = parseInt(document.getElementById('order-qty').value) || 1;
+
+            fetch('{{ route('cart.add') }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({
+                    product_id: productId,
+                    variant_id: variantId,
+                    subvariant_id: subvariantId,
+                    quantity: quantity
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('cart-success-modal').style.display = 'flex';
+                    // Optionally, trigger a Livewire event or JS to update cart badge
+                } else {
+                    alert(data.error || 'Failed to add to cart.');
+                }
+            })
+            .catch(() => alert('Failed to add to cart.'));
+        });
+    });
 
     function selectVariant(variantId) {
         selectedVariantId = variantId;

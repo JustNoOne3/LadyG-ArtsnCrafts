@@ -1,4 +1,4 @@
-<header class="z-50 sticky top-0 left-0 w-full bg-[#f8f8f8] ">
+<header class="sticky top-0 left-0 w-full bg-[#f8f8f8] ">
     <div class="mx-auto w-full px-4 sm:px-8 lg:px-16">
         <!-- Responsive header: logo left, login/cart right on mobile -->
         <div class="flex h-20 md:h-24 justify-between md:justify-end items-center font-poppins gap-4 md:gap-12 md:border-b-2 md:rounded md:border-[#EBAE6E]">
@@ -12,6 +12,14 @@
             <!-- Desktop nav -->
             <div class="hidden md:block">
                 <ul class="flex items-center gap-6 text-lg justify-center">
+                    @if(auth()->user())
+                        <li>
+                            <a class="text-[#8c370f] hover:text-[#BA4B18] transition" href="/my-orders"> My Orders </a>
+                        </li>
+                    @endif
+                    <li>
+                        <a class="text-[#8c370f]"> | </a>
+                    </li>
                     <li>
                         <a class="text-[#8c370f] hover:text-[#BA4B18] transition" href="/about-us"> About Us </a>
                     </li>
@@ -35,16 +43,24 @@
                 @else
                     <a class="text-[#8c370f] text-sm px-2 py-1 rounded hover:text-[#BA4B18]" href="#Partners">Login</a>
                 @endif
-                <a class="block text-teal-600" href="#">
-                    <x-bi-cart3 class="w-8 h-8 text-[#8c370f] hover:text-[#BA4B18]" />
-                </a>
+                @livewire('cart-badge')
             </div>
             <!-- Desktop cart -->
-            <div class="hidden md:flex items-center">
-                <a class="block text-teal-600" href="#">
-                    <x-bi-cart3 class="w-12 h-12 text-[#8c370f] hover:text-[#BA4B18]" />
-                </a>
+            <div class="hidden md:flex items-center gap-8">
+                @livewire('cart-badge')
+                @if(auth()->user())
+                    <x-filament::icon-button
+                        {{-- class="h-32 w-32" --}}
+                        size="xl"
+                        color="warning"
+                        icon="heroicon-s-user-circle"
+                        wire:click="openNewUserModal"
+                        label="Profile"
+                    />
+                @endif
             </div>
+            
+            
         </div>
         <div class="hidden md:block min-h-36 p-4 w-full flex justify-center">
             <div 

@@ -36,7 +36,11 @@
             <div class="w-1/2 h-auto min-h-96 bg-white rounded-lg shadow-lg flex flex-col items-center justify-center p-8">
                 <span class="text-2xl font-bold text-[#7a4025]">Welcome to LadyG Arts & Crafts</span>
                 <span class="text-lg text-[#7a4025]">Please log in to continue</span>
-                    @include('auth.partials.login-form')
+                @include('auth.partials.login-form')
+                <div class="mt-6 flex flex-col items-center w-full">
+                    <span class="text-sm text-gray-600 mb-2">Don't have an account?</span>
+                    <a href="{{ route('signup') }}" class="inline-block px-6 py-2 bg-[#EBAE6E] text-white font-semibold rounded hover:bg-[#d89a4c] transition-colors duration-200">Sign Up</a>
+                </div>
 
             </div>
         </div>

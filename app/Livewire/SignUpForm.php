@@ -39,8 +39,8 @@ class SignUpForm extends Component
 
         Auth::login($user);
 
-        $this->showWelcomeModal = true;
         $this->isLoading = false;
+        $this->redirectToHome();
     }
 
     public function redirectToHome()

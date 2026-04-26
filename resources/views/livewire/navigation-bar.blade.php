@@ -1,4 +1,4 @@
-<header class="z-50 sticky top-0 left-0 w-full bg-[#f8f8f8] ">
+<header class="sticky top-0 left-0 w-full bg-[#f8f8f8] ">
     <div class="mx-auto w-full px-4 sm:px-8 lg:px-16">
         <!-- Responsive header: logo left, login/cart right on mobile -->
         <div class="flex h-24 justify-between md:justify-end items-center font-poppins gap-4 md:gap-12 border-b-2 rounded border-[#EBAE6E]">
@@ -20,28 +20,17 @@
                     </li>
                     <li>
                         @if(auth()->user())
-                            <a wire:click="logoutModal" class="text-[#8c370f] hover:text-[#BA4B18] transition">Log out</a>
+                            @livewire('logout-modal')
                         @else
                             <a class="text-[#8c370f] hover:text-[#BA4B18] transition" href="/login">Log in or Create an Account  </a>
                         @endif
-                        <!-- Logout Confirmation Modal -->
-                        <div id="logout-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-                            <div class="bg-white rounded-lg shadow-lg p-8 max-w-sm w-full text-center">
-                                <h2 class="text-2xl font-bold mb-4 text-[#7a4025]">Confirm Logout</h2>
-                                <p class="mb-6 text-gray-700">Are you sure you want to log out?</p>
-                                <div class="flex gap-4 justify-center">
-                                    <a href="/logout" class="bg-[#7a4025] text-white px-6 py-2 rounded hover:bg-[#63321c] font-semibold">Yes, Log out</a>
-                                    <button onclick="document.getElementById('logout-modal').classList.add('hidden');" class="bg-gray-300 text-gray-700 px-6 py-2 rounded hover:bg-gray-400 font-semibold">Cancel</button>
-                                </div>
-                            </div>
-                        </div>
                     </li>
                 </ul>
             </div>
             <!-- Mobile nav: login & cart right -->
             <div class="flex items-center gap-2 md:hidden">
                 @if(auth()->user())
-                    <a wire:click="logoutModal" class="text-[#8c370f] hover:text-[#BA4B18] transition">Log out</a>
+                    @livewire('logout-modal')
                 @else
                     <a class="text-[#8c370f] hover:text-[#BA4B18] transition" href="/login">Log in or Create an Account  </a>
                 @endif
@@ -60,13 +49,13 @@
                     </div>
                 </div>
                 <a class="block text-teal-600" href="#">
-                    <x-bi-cart3 class="w-8 h-8 text-[#8c370f] hover:text-[#BA4B18]" />
+                    @livewire('cart-badge')
                 </a>
             </div>
             <!-- Desktop cart -->
             <div class="hidden md:flex items-center">
                 <a class="block text-teal-600" href="#">
-                    <x-bi-cart3 class="w-12 h-12 text-[#8c370f] hover:text-[#BA4B18]" />
+                    @livewire('cart-badge')
                 </a>
             </div>
         </div>
