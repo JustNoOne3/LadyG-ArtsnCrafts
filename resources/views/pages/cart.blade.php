@@ -5,6 +5,13 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
         <title>Lady G Online Shoppe</title>
+        @php
+            $settings = app(\App\Settings\GeneralSettings::class);
+        @endphp
+        @if($settings && $settings->site_favicon)
+            <link rel="icon" type="image/png" href="{{ Storage::url($settings->site_favicon) }}" />
+        @endif
+        <meta name="csrf-token" content="{{ csrf_token() }}">
         @vite('resources/css/app.css')
         @vite('resources/js/app.js')
         <link href="https://fonts.cdnfonts.com/css/poppins" rel="stylesheet">
@@ -80,14 +87,20 @@
                                 </tbody>
                             </table>
                         </div>
+        
+                        <template x-if="errorMsg">
+                            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded mb-2 text-sm" x-html="errorMsg"></div>
+                        </template>
                         <div class="flex flex-col md:flex-row justify-between items-center gap-4 mt-6 border-t pt-6">
                             <div class="text-xl font-bold text-[#7a4025]">Total: ₱<span x-text="formatPrice(total)"></span></div>
-                            <div class="flex gap-4 w-full md:w-auto">
-                                <button type="button" @click="window.location.href='/'" class="flex-1 md:flex-none px-6 py-2 rounded bg-gray-200 text-[#7a4025] font-semibold hover:bg-gray-300">Continue Shopping</button>
-                                <button type="button" :disabled="selected.length === 0" @click="submitCheckout()" class="flex-1 md:flex-none px-6 py-2 rounded bg-[#7a4025] text-white font-semibold hover:bg-[#63321c] disabled:opacity-50">Checkout</button>
-                                <form id="checkoutForm" method="POST" action="{{ route('cart.checkout') }}" style="display:none;">
-                                    @csrf
-                                </form>
+                            <div class="flex flex-col gap-2 w-full md:w-auto">
+                                <div class="flex gap-4">
+                                    <button type="button" @click="window.location.href='/'" class="flex-1 md:flex-none px-6 py-2 rounded bg-gray-200 text-[#7a4025] font-semibold hover:bg-gray-300">Continue Shopping</button>
+                                    <button type="button" :disabled="selected.length === 0" @click="submitCheckout()" class="flex-1 md:flex-none px-6 py-2 rounded bg-[#7a4025] text-white font-semibold hover:bg-[#63321c] disabled:opacity-50">Checkout</button>
+                                    <form id="checkoutForm" method="POST" action="{{ route('cart.checkout') }}" style="display:none;">
+                                        @csrf
+                                    </form>
+                                </div>
                             </div>
                         </div>
                     </form>
@@ -110,11 +123,49 @@
                         this.updateTotal();
                     });
                 },
-                submitCheckout() {
+                errorMsg: '',
+                async submitCheckout() {
+                    this.errorMsg = '';
+                    if (this.selected.length === 0) return;
+                    // Save modified quantities to backend before validating stock
+                    const updateRes = await fetch('/api/cart/update-quantities', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                        },
+                        body: JSON.stringify({
+                            items: this.cart.filter(i => this.selected.includes(i.id)).map(i => ({ id: i.id, quantity: i.quantity }))
+                        })
+                    });
+                    const updateResult = await updateRes.json();
+                    if (!updateResult.success) {
+                        this.errorMsg = updateResult.message || 'Failed to update cart quantities.';
+                        return;
+                    }
+                    // Validate stock before submitting
+                    const response = await fetch('/api/cart/validate-stock', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                        },
+                        body: JSON.stringify({ selected: this.selected })
+                    });
+                    const result = await response.json();
+                    if (!result.success) {
+                        let msg = 'Some items have insufficient stock:';
+                        if (result.errors && Array.isArray(result.errors)) {
+                            msg += '<ul class="list-disc pl-5">' + result.errors.map(e => `<li>${e.product_name}: requested ${e.requested}, available ${e.available}</li>`).join('') + '</ul>';
+                        } else if (result.message) {
+                            msg += '<br>' + result.message;
+                        }
+                        this.errorMsg = msg;
+                        return;
+                    }
+                    // If stock is valid, submit the form
                     const form = document.getElementById('checkoutForm');
-                    // Remove any previous hidden inputs
                     Array.from(form.querySelectorAll('input[name="selected[]"]')).forEach(e => e.remove());
-                    // Add one hidden input per selected ID
                     this.selected.forEach(id => {
                         const input = document.createElement('input');
                         input.type = 'hidden';

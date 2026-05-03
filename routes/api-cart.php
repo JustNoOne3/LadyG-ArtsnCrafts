@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Cart;
 use App\Models\Product;
 use App\Models\Variant;
-use App\Models\Subvariant;
+use App\Models\VariantSub;
 
 Route::get('/api/cart/items', function(Request $request) {
     if (!Auth::check()) {

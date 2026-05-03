@@ -5,6 +5,12 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
         <title>Lady G Online Shoppe</title>
+        @php
+            $settings = app(\App\Settings\GeneralSettings::class);
+        @endphp
+        @if($settings && $settings->site_favicon)
+            <link rel="icon" type="image/png" href="{{ Storage::url($settings->site_favicon) }}" />
+        @endif
         @vite('resources/css/app.css')
         @vite('resources/js/app.js')
         <link href="https://fonts.cdnfonts.com/css/poppins" rel="stylesheet">
@@ -91,7 +97,7 @@
                     </div>
 
                     <div class="mt-6 flex gap-4">
-                        <button id="add-to-cart-btn" type="button" class="flex items-center gap-4 px-6 py-3 rounded-lg shadow-lg bg-[#8c370f] text-white font-semibold text-sm md:text-lg hover:bg-[#63321c] transition">
+                        <button id="add-to-cart-btn" type="button" class="flex items-center gap-4 px-6 py-3 rounded-lg shadow-lg bg-[#8c370f] text-white font-semibold text-sm md:text-lg hover:bg-[#63321c] transition" disabled>
                             <x-bi-cart3 class="hidden md:block w-6 h-6 text-white " />
                             Add to Cart
                         </button>
@@ -123,8 +129,24 @@
     let selectedVariantId = null;
     let selectedSubvariantId = null;
 
+    function updateAddToCartButton() {
+        const btn = document.getElementById('add-to-cart-btn');
+        // If there are subvariants for the selected variant, require both to be selected
+        if (selectedVariantId) {
+            const hasSubvariants = subvariants.some(sv => sv.subvar_variantId == selectedVariantId);
+            if (hasSubvariants) {
+                btn.disabled = !selectedSubvariantId;
+            } else {
+                btn.disabled = false;
+            }
+        } else {
+            btn.disabled = true;
+        }
+    }
+
     // Add to Cart AJAX logic
     document.addEventListener('DOMContentLoaded', function() {
+        updateAddToCartButton();
         document.getElementById('add-to-cart-btn').addEventListener('click', function() {
             const productId = {{ $product->id }};
             const variantId = selectedVariantId;
@@ -160,6 +182,7 @@
 
     function selectVariant(variantId) {
         selectedVariantId = variantId;
+        selectedSubvariantId = null; // reset subvariant selection on variant change
         // Highlight selected variant
         document.querySelectorAll('.variant-btn').forEach(btn => btn.classList.remove('border-[#8c370f]', 'border-2'));
         const btn = document.getElementById('variant-btn-' + variantId);
@@ -198,6 +221,7 @@
             const vbtn = document.getElementById('variant-btn-' + variantId);
             if (vbtn) vbtn.classList.add('border-[#8c370f]', 'border-2');
         }
+        updateAddToCartButton();
     }
     function selectSubvariant(subvarId) {
         selectedSubvariantId = subvarId;
@@ -214,5 +238,6 @@
         if (subvar && subvar.subvar_price) {
             document.getElementById('dynamic-price').innerText = '₱' + Number(subvar.subvar_price).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2});
         }
+        updateAddToCartButton();
     }
 </script>

@@ -25,6 +25,7 @@ use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use Filament\Navigation\NavigationGroup;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -33,8 +34,9 @@ class AdminPanelProvider extends PanelProvider
         return $panel
             ->default()
             ->id('admin')
-            ->path('admin')
+            ->path('ladyg-admin-manage')
             ->login(Login::class)
+            ->darkMode(false)
             ->passwordReset(RequestPasswordReset::class)
             ->emailVerification(EmailVerification::class)
             ->favicon(fn(GeneralSettings $settings) => Storage::url($settings->site_favicon))
@@ -46,12 +48,12 @@ class AdminPanelProvider extends PanelProvider
             ->globalSearchKeyBindings(['command+k', 'ctrl+k'])
             ->sidebarCollapsibleOnDesktop()
             ->navigationGroups([
-                Navigation\NavigationGroup::make()
-                    ->label(__('menu.nav_group.content'))
-                    ->collapsible(false),
+                // NavigationGroup::make()
+                //     ->label('Inventory')
+                //     ->icon('heroicon-o-inbox-stack', 'warning'),
                 Navigation\NavigationGroup::make()
                     ->label(__('menu.nav_group.access'))
-                    ->collapsible(false),
+                    ->collapsed(),
                 Navigation\NavigationGroup::make()
                     ->label(__('menu.nav_group.sites'))
                     ->collapsed(),
@@ -100,8 +102,8 @@ class AdminPanelProvider extends PanelProvider
                 Authenticate::class,
             ])
             ->plugins([
-                \TomatoPHP\FilamentMediaManager\FilamentMediaManagerPlugin::make()
-                    ->allowSubFolders(),
+                // \TomatoPHP\FilamentMediaManager\FilamentMediaManagerPlugin::make()
+                //     ->allowSubFolders(),
                 \BezhanSalleh\FilamentExceptions\FilamentExceptionsPlugin::make(),
                 \BezhanSalleh\FilamentShield\FilamentShieldPlugin::make()
                     ->gridColumns([

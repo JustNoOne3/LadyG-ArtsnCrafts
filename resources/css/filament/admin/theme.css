@@ -456,6 +456,7 @@ body {
   .fi-sidebar.fi-sidebar-open {
     @apply fixed z-40 w-[280px] shadow-xl;
     box-shadow: 0 0 25px rgba(var(--primary-rgb), 0.15);
+    background-color: #ffffff;
   }
 
   .fi-main {

@@ -5,6 +5,12 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
         <title>Lady G Online Shoppe</title>
+        @php
+            $settings = app(\App\Settings\GeneralSettings::class);
+        @endphp
+        @if($settings && $settings->site_favicon)
+            <link rel="icon" type="image/png" href="{{ Storage::url($settings->site_favicon) }}" />
+        @endif
         @vite('resources/css/app.css')
         @vite('resources/js/app.js')
         <link href="https://fonts.cdnfonts.com/css/poppins" rel="stylesheet">
@@ -46,7 +52,7 @@
                                     <td class="px-4 py-3 font-mono text-[#7a4025] font-bold">{{ $order->order_reference }}</td>
                                     <td class="px-4 py-3">
                                         <ul class="list-disc ml-4 text-sm text-gray-700">
-                                            @foreach(json_decode($order->order_products, true) as $item)
+                                            @foreach($order->order_products as $item)
                                                 <li>
                                                     <span class="font-medium">{{ $item['product_name'] }}</span>
                                                     <span class="text-xs text-gray-500 ml-1">x{{ $item['quantity'] }}</span>
@@ -57,7 +63,7 @@
                                         </ul>
                                     </td>
                                     <td class="px-4 py-3">
-                                        <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold
+                                        <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold items-center justify-center text-center
                                             @if($order->order_status == 'Pending for Verification') bg-yellow-100 text-yellow-800
                                             @elseif($order->order_status == 'Cancelled') bg-red-100 text-red-800
                                             @elseif($order->order_status == 'Completed') bg-green-100 text-green-800
@@ -65,19 +71,15 @@
                                             {{ $order->order_status }}
                                         </span>
                                     </td>
-                                    <td class="px-4 py-3 text-center  flex flex-col items-center justify-center gap-2">
+                                    <td class="px-4 py-3 text-center flex flex-col items-center justify-center gap-2">
                                         {{-- <form action="{{ route('order.cancel', $order->id) }}" method="POST" class="inline"> --}}
-                                        
-                                        <a href="" class="inline-flex items-center px-3 py-1 bg-amber-500 hover:bg-amber-600 text-white text-xs font-semibold rounded transition" @if($order->order_status == 'Cancelled' || $order->order_status == 'Completed') hidden @endif>
-                                            Cancel Order
-                                        </a>
-                                        @if($order->order_shippingMethod != 1 && empty($order->order_shippingReceipt))
-                                            {{-- <a href="{{ route('order.pay-shipping', $order->id) }}" class="inline-flex items-center px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white text-xs font-semibold rounded transition">
-                                                Pay Shipping
-                                            </a> --}}
-                                            <a href="" class="inline-flex items-center px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white text-xs font-semibold rounded transition">
-                                                Pay Shipping
+                                        @if($order->order_status == 'Pending for Verification')
+                                            <a href="" class="inline-flex items-center px-3 py-1 bg-amber-500 hover:bg-amber-600 text-white text-xs font-semibold rounded transition" @if($order->order_status == 'Cancelled' || $order->order_status == 'Completed') hidden @endif>
+                                                Cancel Order
                                             </a>
+                                        @endif
+                                        @if($order->order_status == 'Waiting for Payment')
+                                            <livewire:pay-shipping :order-id="$order->id" :key="$order->id" />
                                         @endif
                                     </td>
                                 </tr>

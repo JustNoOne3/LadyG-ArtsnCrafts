@@ -5,6 +5,12 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
         <title>Lady G Online Shoppe</title>
+        @php
+            $settings = app(\App\Settings\GeneralSettings::class);
+        @endphp
+        @if($settings && $settings->site_favicon)
+            <link rel="icon" type="image/png" href="{{ Storage::url($settings->site_favicon) }}" />
+        @endif
         @vite('resources/css/app.css')
         @vite('resources/js/app.js')
         <link href="https://fonts.cdnfonts.com/css/poppins" rel="stylesheet">

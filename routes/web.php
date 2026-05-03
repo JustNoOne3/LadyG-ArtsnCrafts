@@ -109,7 +109,8 @@ Route::post('/login', function (Request $request) {
 
     if (Auth::attempt($credentials, $request->boolean('remember'))) {
         $request->session()->regenerate();
-        return redirect()->intended('/');
+        // Prevent redirecting to API endpoints after login
+        return redirect('/');
     }
 
     return back()->withErrors([
@@ -162,19 +163,33 @@ Route::post('/cart/add', function(Request $request) {
     if (!auth()->check()) {
         return response()->json(['error' => 'Unauthorized'], 401);
     }
-    Cart::create([
-        'cart_user' => auth()->id(),
-        'cart_product' => $validated['product_id'],
-        'cart_variant' => $validated['variant_id'],
-        'cart_subVariant' => $validated['subvariant_id'],
-        'cart_quantity' => $validated['quantity'],
-    ]);
+    $userId = auth()->user()->id;
+    $existing = Cart::where('cart_user', $userId)
+        ->where('cart_product', $validated['product_id'])
+        ->where('cart_variant', $validated['variant_id'])
+        ->where('cart_subVariant', $validated['subvariant_id'])
+        ->first();
+
+    if ($existing) {
+        $existing->cart_quantity += $validated['quantity'];
+        $existing->save();
+    } else {
+        Cart::create([
+            'cart_user' => $userId,
+            'cart_product' => $validated['product_id'],
+            'cart_variant' => $validated['variant_id'],
+            'cart_subVariant' => $validated['subvariant_id'],
+            'cart_quantity' => $validated['quantity'],
+        ]);
+    }
     return response()->json(['success' => true]);
 })->name('cart.add');
 
 Route::get('/cart/view', function() {
     return view('pages.cart');
-})->name('cart.view');
+})
+->middleware(['web', 'auth'])
+->name('cart.view');
 
 
 // Authenticated AJAX endpoint for fetching cart items
@@ -202,6 +217,56 @@ Route::get('/api/cart/items', function(Request $request) {
             ];
         });
     return response()->json($cartItems);
+})->middleware(['web', 'auth']);
+
+// API: Update cart item quantities before checkout
+Route::post('/api/cart/update-quantities', function (Request $request) {
+    $items = $request->input('items', []);
+    if (!is_array($items) || empty($items)) {
+        return response()->json(['success' => false, 'message' => 'No items to update.'], 400);
+    }
+    foreach ($items as $item) {
+        if (!isset($item['id'], $item['quantity'])) continue;
+        $cart = \App\Models\Cart::where('id', $item['id'])->where('cart_user', Auth::id())->first();
+        if ($cart) {
+            $cart->cart_quantity = max(1, (int)$item['quantity']);
+            $cart->save();
+        }
+    }
+    return response()->json(['success' => true]);
+})->middleware(['web', 'auth']);
+
+// API: Validate stock for selected cart items before checkout
+Route::post('/api/cart/validate-stock', function (Request $request) {
+    $ids = $request->input('selected', []);
+    if (!is_array($ids) || empty($ids)) {
+        return response()->json(['success' => false, 'message' => 'No items selected.'], 400);
+    }
+    $cartItems = \App\Models\Cart::whereIn('id', $ids)
+        ->where('cart_user', Auth::id())
+        ->with(['product', 'subvariant'])
+        ->get();
+    $errors = [];
+    foreach ($cartItems as $item) {
+        $stock = null;
+        if ($item->subvariant) {
+            $stock = $item->subvariant->subvar_quantity;
+        } elseif ($item->product) {
+            $stock = $item->product->product_stock ?? null;
+        }
+        if ($stock !== null && $item->cart_quantity > $stock) {
+            $errors[] = [
+                'id' => $item->id,
+                'product_name' => $item->product->product_name ?? '',
+                'requested' => $item->cart_quantity,
+                'available' => $stock,
+            ];
+        }
+    }
+    if (!empty($errors)) {
+        return response()->json(['success' => false, 'errors' => $errors], 200);
+    }
+    return response()->json(['success' => true]);
 })->middleware(['web', 'auth']);
 
 // POST: Receive selected cart item IDs, store in session, redirect to checkout

@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('order_shippingMethod')->nullable();
             $table->string('order_shippingAddress')->nullable();
             $table->string('order_shippingReceipt')->nullable();
+            $table->string('order_shippingFee')->nullable();
             $table->string('order_purchaseReceipt')->nullable();
             $table->string('order_status')->nullable();
             $table->timestamps();

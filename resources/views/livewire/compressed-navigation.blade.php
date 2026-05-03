@@ -16,10 +16,10 @@
                         <li>
                             <a class="text-[#8c370f] hover:text-[#BA4B18] transition" href="/my-orders"> My Orders </a>
                         </li>
+                        <li>
+                            <a class="text-[#8c370f]"> | </a>
+                        </li>
                     @endif
-                    <li>
-                        <a class="text-[#8c370f]"> | </a>
-                    </li>
                     <li>
                         <a class="text-[#8c370f] hover:text-[#BA4B18] transition" href="/about-us"> About Us </a>
                     </li>

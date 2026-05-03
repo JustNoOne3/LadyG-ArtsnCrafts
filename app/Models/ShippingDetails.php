@@ -19,4 +19,9 @@ class ShippingDetails extends Model
         'shipping_address',
         'shipping_isDefault',
     ];
+
+    public function orders() : BelongsTo
+    {
+        return $this->belongsTo(\App\Models\Order::class);
+    }
 }

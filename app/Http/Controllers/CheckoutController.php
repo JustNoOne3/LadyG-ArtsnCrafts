@@ -56,7 +56,7 @@ class CheckoutController extends Controller
             foreach ($orderProducts as $item) {
                 $cart = Cart::where('id', $item['product_id'])->first();
                 $subVar = VariantSub::where('id', $cart->cart_subVariant)->first();
-                if($subVar->subvar_quantity > $cart->cart_quantity){
+                if($subVar->subvar_quantity >= $cart->cart_quantity){
                     $subVar->subvar_quantity -= $cart->cart_quantity;
                     $subVar->save();
                 } else {
