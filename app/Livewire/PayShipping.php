@@ -6,6 +6,8 @@ use Livewire\Component;
 use Livewire\WithFileUploads;
 use Illuminate\Support\Facades\Storage;
 use App\Models\Order;
+use App\Models\ShippingOptions;
+use App\Models\PaymentDetails;
 
 class PayShipping extends Component
 {
@@ -16,6 +18,9 @@ class PayShipping extends Component
     public $orderId;
     public $shippingReceipt;
     public $successModal = false;
+    public $shippingOption;
+    public $amount;
+    public $paymentDetails;
 
     protected $rules = [
         'shippingReceipt' => 'required|image|max:4096',
@@ -25,6 +30,11 @@ class PayShipping extends Component
     {
         $this->orderId = $orderId;
         $this->showButton = $showButton;
+
+        $order = Order::findOrFail($this->orderId);
+        $this->shippingOption = ShippingOptions::find($order->order_shippingMethod)->value('option_name');
+        $this->amount = $order->order_shippingFee;
+        $this->paymentDetails = PaymentDetails::all();
     }
 
     public function openModal()
