@@ -52,6 +52,10 @@ const fetchProducts = async (page = 1) => {
         page,
         perPage
     });
+    // Add selected_branch from global JS variable if available
+    if (window.SELECTED_BRANCH) {
+        params.append('selected_branch', window.SELECTED_BRANCH);
+    }
     const res = await fetch(`/api/products?${params.toString()}`);
     products.value = await res.json();
 };

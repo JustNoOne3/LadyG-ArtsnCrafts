@@ -33,6 +33,18 @@ Route::post('/banners/{banner}/click', function (App\Models\Banner\Content $bann
 
 Route::get('/products', function (Request $request) {
     $query = Product::query();
+    $selectedBranch = $request->input('selected_branch') ?? session()->get('selected_branch');
+    if (!$selectedBranch) {
+        // No branch selected, return empty result
+        return response()->json([
+            'data' => [],
+            'current_page' => 1,
+            'last_page' => 1,
+            'per_page' => $request->input('perPage', 15),
+            'total' => 0
+        ]);
+    }
+    $query->where('product_branch', $selectedBranch);
     if ($request->brand) {
         $query->where('product_brand', $request->brand);
     }

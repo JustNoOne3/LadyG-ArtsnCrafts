@@ -31,13 +31,23 @@
             </div>
 
             <div class="grid grid-cols-2 md:grid-cols-5 gap-2 md:gap-6">
-                <a v-for="product in products.data" :key="product.id" :href="`/product/${product.id}`"  class="bg-white rounded-lg shadow p-4 flex flex-col items-start hover:shadow-xl transition cursor-pointer">
-                    <img :src="product.product_thumbnail_url" :alt="product.product_name" class="w-32 h-44 self-center rounded mb-2">
-                    <div class="font-semibold text-base text-left mb-1">{{ product.product_name }}</div>
-                    <div class="text-sm text-gray-600 text-left mb-1">${{ Number(product.product_price).toFixed(2) }}</div>
-                    <div class="text-xs text-gray-500 text-left mb-1">Sold: {{ product.product_soldCount }}</div>
-                </a>
-                <div v-if="products.data.length === 0" class="col-span-2 md:col-span-5 text-center text-gray-500 py-12">No products found.</div>
+                <template v-if="loading">
+                    <div v-for="n in 10" :key="'skeleton-' + n" class="bg-white rounded-lg shadow p-4 flex flex-col items-start animate-pulse">
+                        <div class="w-32 h-44 self-center rounded mb-2 bg-[#e6d9cb]"></div>
+                        <div class="h-5 w-3/4 bg-[#e6d9cb] rounded mb-1"></div>
+                        <div class="h-4 w-1/2 bg-[#e6d9cb] rounded mb-1"></div>
+                        <div class="h-3 w-1/3 bg-[#e6d9cb] rounded mb-1"></div>
+                    </div>
+                </template>
+                <template v-else>
+                    <a v-for="product in products.data" :key="product.id" :href="`/product/${product.id}`"  class="bg-white rounded-lg shadow p-4 flex flex-col items-start hover:shadow-xl transition cursor-pointer">
+                        <img :src="product.product_thumbnail_url" :alt="product.product_name" class="w-32 h-44 self-center rounded mb-2">
+                        <div class="font-semibold text-base text-left mb-1">{{ product.product_name }}</div>
+                        <div class="text-sm text-gray-600 text-left mb-1">${{ Number(product.product_price).toFixed(2) }}</div>
+                        <div class="text-xs text-gray-500 text-left mb-1">Sold: {{ product.product_soldCount }}</div>
+                    </a>
+                    <div v-if="products.data.length === 0" class="col-span-2 md:col-span-5 text-center text-gray-500 py-12">No products found.</div>
+                </template>
             </div>
 
             <div class="mt-8 flex items-center justify-center gap-8">
@@ -53,6 +63,7 @@
     import { ref, onMounted, watch } from 'vue';
 
     const products = ref({ data: [], current_page: 1, last_page: 1 });
+    const loading = ref(true);
     const brands = ref([]);
     const categories = ref([]);
     const brand = ref('');
@@ -61,6 +72,7 @@
     const perPage = 15;
 
     const fetchProducts = async (page = 1) => {
+        loading.value = true;
         let params = new URLSearchParams({
             brand: brand.value,
             category: category.value,
@@ -68,8 +80,13 @@
             page,
             perPage
         });
+        // Add selected_branch from global JS variable if available
+        if (window.SELECTED_BRANCH) {
+            params.append('selected_branch', window.SELECTED_BRANCH);
+        }
         const res = await fetch(`/api/products?${params.toString()}`);
         products.value = await res.json();
+        loading.value = false;
     };
 
     const fetchBrands = async () => {

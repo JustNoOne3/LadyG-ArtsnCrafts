@@ -2,6 +2,9 @@
     <div class="mx-auto w-full px-4 sm:px-8 lg:px-16">
         <!-- Responsive header: logo left, login/cart right on mobile -->
         <div class="flex h-20 md:h-24 justify-between md:justify-end items-center font-poppins gap-4 md:gap-12 md:border-b-2 md:rounded md:border-[#EBAE6E]">
+            <div class="flex items-center">
+                @livewire('branch-selector')
+            </div>
             <div class="flex items-center flex-shrink-0">
                 <!-- WEB APP Logo -->
                 <a class="block text-teal-600" href="/">
@@ -80,12 +83,21 @@
                         @foreach(App\Models\Brand::select('id', 'brand_logo')->get() as $idx => $brand)
                             <div class="flex block justify-center items-center min-w-0">
                                 <a href="{{ route('shop.view', ['id' => $brand->id]) }}" style="display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;">
-                                    <img 
-                                        src="{{ asset('storage/' . $brand->brand_logo) }}" 
-                                        alt="{{ $brand->brand_name }} Logo" 
-                                        class="h-20 w-auto object-contain max-w-[100px] lg:h-32 md:max-w-[120px] transition-transform duration-300 ease-in-out hover:scale-125 box-border {{ (string)$brand->id === (string)$currentBrandId ? 'border-2 rounded-xl border-[#8c370f] rounded-full' : '' }}"
-                                        style="max-width: 100%; min-width: 0;"
-                                    >
+                                    <div x-data="{ loaded: false }" x-init="if ($el.querySelector('img').complete) { loaded = true }" class="flex items-center justify-center w-[100px] lg:w-[120px] h-20 lg:h-32">
+                                        <!-- Skeleton Loader -->
+                                        <div x-show="!loaded" class="w-full h-full bg-[#e6d9cb] animate-pulse rounded-xl"></div>
+                                        <img 
+                                            src="{{ asset('storage/' . $brand->brand_logo) }}" 
+                                            alt="{{ $brand->brand_name }} Logo" 
+                                            class="h-20 w-auto object-contain max-w-[100px] lg:h-32 md:max-w-[120px] transition-transform duration-300 ease-in-out hover:scale-125 box-border {{ (string)$brand->id === (string)$currentBrandId ? 'border-2 rounded-xl border-[#8c370f] rounded-full' : '' }}"
+                                            style="max-width: 100%; min-width: 0;"
+                                            x-show="loaded"
+                                            x-transition:enter="transition-opacity duration-300"
+                                            x-transition:enter-start="opacity-0"
+                                            x-transition:enter-end="opacity-100"
+                                            @load="console.log('Logo loaded:', $el.src); loaded = true"
+                                        >
+                                    </div>
                                 </a>
                             </div>
                         @endforeach

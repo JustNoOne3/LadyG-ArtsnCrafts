@@ -15,6 +15,7 @@ class Product extends Model
         'product_soldCount',
         'product_thumbnail',
         'product_images',
+        'product_branch',
         'product_brand',
         'product_category',
     ];

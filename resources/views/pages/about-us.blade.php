@@ -38,4 +38,5 @@
         
         {{-- Footer --}}
         @livewire('footer-section')
+        @livewireScripts
     </body>

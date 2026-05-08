@@ -28,12 +28,12 @@
                 @livewire('compressed-navigation')
             </div>
         </div>
-        <div id="loadingScreen" class="fixed inset-0 z-50 flex items-center justify-center bg-[#FAF5F0] transition-opacity duration-700 h-screen w-screen">
+        {{-- <div id="loadingScreen" class="fixed inset-0 z-50 flex items-center justify-center bg-[#FAF5F0] transition-opacity duration-700 h-screen w-screen">
             <div class="flex flex-col justify-center items-center w-full h-full">
                 <x-lottie path="{{asset('animations/LadyG.json')}}" loop="true" autoplay="true" class="mx-auto w-auto h-96" />
             </div>
-        </div>
-        <script>
+        </div> --}}
+        {{-- <script>
             window.addEventListener('DOMContentLoaded', function() {
                 // Always scroll to top on page load
                 window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
@@ -45,7 +45,7 @@
                     setTimeout(() => loading.style.display = 'none', 700);
                 }, 4500);
             });
-        </script>
+        </script> --}}
         {{-- Breadcrumbs --}}
         <div class="w-full h-10 md:h-14 bg-[#e6d9cb] px-2 lg:px-40 flex gap-2 md:gap-4 text-[#7a4025] text-sm md:text-md items-start md:items-center">
             <a class="hover:underline" href="/"> Home </a>
@@ -54,6 +54,10 @@
         </div>
         <!-- Vue Brand Section -->
         <div id="brand-section-app" data-brand-id="{{ $id }}"></div>
+        <script>
+            window.SELECTED_BRANCH = @json(session('selected_branch'));
+        </script>
         {{-- Footer --}}
         @livewire('footer-section')
+        @livewireScripts
     </body>
