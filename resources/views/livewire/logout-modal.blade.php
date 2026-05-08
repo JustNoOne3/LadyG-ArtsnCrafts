@@ -21,9 +21,9 @@
         <div class="flex gap-4 justify-center">
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
-                <button type="submit" class="bg-[#7a4025] text-white px-6 py-2 rounded hover:bg-[#63321c] font-semibold">Yes, Log out</button>
+                <button type="submit" class="bg-[#7a4025] text-white px-2 md:px-6 py-2 rounded hover:bg-[#63321c] font-semibold">Yes, Log out</button>
             </form>
-            <button wire:click="closeModal" class="bg-gray-300 text-gray-700 px-6 py-2 rounded hover:bg-gray-400 font-semibold">Cancel</button>
+            <button wire:click="closeModal" class="bg-gray-300 text-gray-700 px-2 md:px-6 py-2 rounded hover:bg-gray-400 font-semibold">Cancel</button>
         </div>
     </div>
 </x-filament::modal>

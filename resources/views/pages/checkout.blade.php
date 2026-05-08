@@ -118,7 +118,7 @@
                                             </template>
                                         </div>
                                     </div>
-                                    <div class="flex flex-col items-end min-w-[120px]">
+                                    <div class="flex flex-col items-end min-w-[120px] pr-2">
                                         <span class="text-gray-700">Qty: <span x-text="item.quantity"></span></span>
                                         <span class="font-semibold text-[#7a4025]">₱<span x-text="formatPrice(item.product_price)"></span></span>
                                         <span class="text-sm text-gray-500">Subtotal:</span>
@@ -267,60 +267,78 @@
                         </div>
                     </div>
 
-                    <!-- Payment Receipt Upload -->
-                    <div class="mb-8" x-data="fileUploadComponent()">
-                        <h2 class="text-xl font-bold text-[#7a4025] mb-2">Upload Payment Receipt</h2>
+                    <!-- Payment Receipt Upload (Modernized) -->
+                    <div class="mb-8">
+                        <h2 class="text-lg font-bold mb-4 text-[#7a4025]">Upload Shipping Fee Receipt</h2>
                         <div
-                            class="relative flex flex-col items-center justify-center border-2 border-dashed rounded-lg p-6 bg-[#f8f8f8] transition hover:border-[#7a4025] hover:bg-[#f3ece6] min-h-[180px] w-full cursor-pointer"
-                            :class="{ 'border-[#7a4025]': isDragging, 'border-gray-300': !isDragging }"
-                            @dragover.prevent="isDragging = true"
-                            @dragleave.prevent="isDragging = false"
-                            @drop.prevent="handleDrop($event)"
-                            @click="fileInput.click()"
+                            x-data="{
+                                file: null,
+                                fileName: '',
+                                fileSize: '',
+                                previewUrl: '',
+                                isImage: false,
+                                updateFile(event) {
+                                    const input = event.target;
+                                    if (input.files && input.files[0]) {
+                                        this.file = input.files[0];
+                                        this.fileName = this.file.name;
+                                        this.fileSize = this.formatFileSize(this.file.size);
+                                        this.isImage = this.file.type.startsWith('image/');
+                                        if (this.isImage) {
+                                            const reader = new FileReader();
+                                            reader.onload = e => { this.previewUrl = e.target.result; };
+                                            reader.readAsDataURL(this.file);
+                                        } else {
+                                            this.previewUrl = '';
+                                        }
+                                    } else {
+                                        this.file = null;
+                                        this.fileName = '';
+                                        this.fileSize = '';
+                                        this.previewUrl = '';
+                                        this.isImage = false;
+                                    }
+                                },
+                                formatFileSize(size) {
+                                    if (size < 1024) return size + ' bytes';
+                                    if (size < 1024 * 1024) return (size / 1024).toFixed(1) + ' KB';
+                                    return (size / (1024 * 1024)).toFixed(2) + ' MB';
+                                },
+                                removeFile() {
+                                    this.file = null;
+                                    this.fileName = '';
+                                    this.fileSize = '';
+                                    this.previewUrl = '';
+                                    this.isImage = false;
+                                    $refs.input.value = '';
+                                }
+                            }"
+                            class="flex flex-col gap-2"
                         >
-                            <!-- Placeholder (only show if no file selected and not loading) -->
-                            <template x-if="!hasFile && !loading">
-                                <div class="flex flex-col items-center justify-center w-full h-full">
-                                    <svg class="w-12 h-12 text-[#7a4025] mb-2" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5V19a2 2 0 002 2h14a2 2 0 002-2v-2.5M16 10l-4-4m0 0l-4 4m4-4v12" />
-                                    </svg>
-                                    <span class="text-[#7a4025] font-semibold">Drag & drop or click to upload</span>
-                                    <span class="text-xs text-gray-500">Accepted: image/*, PDF</span>
-                                </div>
-                            </template>
-                            <input
-                                type="file"
-                                accept="image/*,application/pdf"
-                                class="hidden"
-                                x-ref="fileInput"
-                                @change="uploadPaymentReceipt"
-                                required
+                            <label for="shippingReceipt" class="block text-sm font-medium text-[#7a4025]">Select Image</label>
+                            <div class="relative flex flex-col items-center justify-center border-2 border-dashed rounded-lg p-6 bg-[#f8f8f8] transition hover:border-[#7a4025] hover:bg-[#f3ece6] min-h-[180px] w-full cursor-pointer"
+                                :class="{ 'border-[#7a4025]': file, 'border-gray-300': !file }"
+                                @click="$refs.input.click()"
+                                @dragover.prevent
+                                @drop.prevent="updateFile($event)"
                             >
-                            <template x-if="loading">
-                                <div class="absolute inset-0 flex items-center justify-center bg-white bg-opacity-70 rounded-lg">
-                                    <svg class="animate-spin h-8 w-8 text-[#7a4025]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
-                                    </svg>
-                                </div>
-                            </template>
-                            <template x-if="previewUrl && !loading">
-                                <div class="mt-4 w-full flex flex-col items-center">
-                                    <template x-if="isImage">
-                                        <img :src="previewUrl" alt="Preview" class="max-h-40 rounded shadow border mb-2">
-                                    </template>
-                                    <template x-if="!isImage">
-                                        <div class="flex flex-col items-center bg-white border rounded shadow p-4 w-full max-w-xs mb-2">
-                                            <svg class="w-10 h-10 text-[#7a4025] mb-2" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M7 7V3h10v4M7 7h10M7 7v10a2 2 0 002 2h6a2 2 0 002-2V7M7 7H5a2 2 0 00-2 2v10a2 2 0 002 2h2" />
-                                            </svg>
-                                            <span class="font-semibold text-[#7a4025] text-sm truncate w-full" x-text="fileName"></span>
+                                <input type="file" x-ref="input" accept="image/*,application/pdf" class="hidden" @change="updateFile($event)" />
+                                <template x-if="!file">
+                                    <span class="text-gray-400">Click or drag an image here to upload</span>
+                                </template>
+                                <template x-if="file">
+                                    <div class="flex flex-col items-center gap-2 w-full">
+                                        <template x-if="isImage && previewUrl">
+                                            <img :src="previewUrl" alt="Preview" class="max-h-40 rounded shadow mb-2" />
+                                        </template>
+                                        <div class="flex flex-col items-center gap-1">
+                                            <span class="text-sm font-semibold text-[#7a4025]" x-text="fileName"></span>
                                             <span class="text-xs text-gray-500" x-text="fileSize"></span>
                                         </div>
-                                    </template>
-                                    <button type="button" class="mt-2 px-4 py-1 rounded bg-gray-200 text-[#7a4025] font-semibold hover:bg-gray-300" @click.stop="removeFile">Remove</button>
-                                </div>
-                            </template>
+                                        <button type="button" @click.stop="removeFile()" class="mt-2 px-3 py-1 bg-red-500 text-white text-xs rounded hover:bg-red-600">Remove</button>
+                                    </div>
+                                </template>
+                            </div>
                         </div>
                     </div>
 
@@ -672,7 +690,7 @@
                     },
                     isPickUpSelected() {
                         // Find the Pick-Up option by name (case-insensitive)
-                        const pickUpOption = Array.from(document.querySelectorAll('input[name=shipping_method]')).find(el => el.nextSibling.textContent.trim().toLowerCase().includes('pick-up'));
+                        const pickUpOption = Array.from(document.querySelectorAll('input[name=shipping_method_fake]')).find(el => el.nextSibling.textContent.trim().toLowerCase().includes('pick-up'));
                         return pickUpOption && pickUpOption.checked;
                     }
                 }

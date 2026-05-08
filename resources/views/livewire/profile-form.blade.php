@@ -54,7 +54,7 @@
             <div class="flex-1 bg-white shadow-xl rounded-3xl p-8 border border-[#f3e7d9]">
                 <form wire:submit.prevent="updatePassword" autocomplete="off" class="flex flex-col">
                     <h2 class="text-2xl font-bold mb-8 text-[#7a4025] tracking-tight">Change Password</h2>
-                    <div class="grid grid-cols-1 gap-6 mb-8">
+                    <div class="flex flex-col justify-between h-full gap-6 mb-8">
                         <div class="relative md:col-span-1">
                             <input type="password" wire:model.defer="current_password" id="current_password" class="peer w-full border-2 border-[#e6d9cb] rounded-lg px-4 pt-6 pb-2 focus:outline-none focus:border-[#d19658] bg-transparent placeholder-transparent transition" placeholder="Current Password" />
                             <label for="current_password" class="absolute left-4 top-2 text-[#7a4025] text-sm transition-all peer-placeholder-shown:top-6 peer-placeholder-shown:text-base peer-focus:top-2 peer-focus:text-sm">Current Password</label>

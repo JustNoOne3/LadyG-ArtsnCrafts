@@ -64,6 +64,7 @@
                         {{-- type="button"
                         wire:click="{{}}" --}}
                         class="flex items-center justify-center w-12 h-12 rounded-full bg-[#e6d9cb] hover:bg-[#d19658] border-2 border-[#e6d9cb] focus:outline-none transition relative"
+                        href="/profile"
                         {{-- title="Profile" --}}
                     >
                         @if($avatarUrl)
