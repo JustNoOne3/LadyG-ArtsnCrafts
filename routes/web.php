@@ -361,3 +361,44 @@ Route::get('/my-orders', function() {
         'orders' => $orders
     ]);
 })->name('my-orders')->middleware('auth');
+
+// Buy Now: Direct checkout for a single product (create real cart entry and use normal checkout)
+Route::post('/buy-now', function(Request $request) {
+    $validated = $request->validate([
+        'product_id' => 'required|integer|exists:products,id',
+        'variant_id' => 'nullable|integer',
+        'subvariant_id' => 'nullable|integer',
+        'quantity' => 'required|integer|min:1',
+    ]);
+    if (!auth()->check()) {
+        return response()->json(['error' => 'Unauthorized'], 401);
+    }
+    $product = \App\Models\Product::find($validated['product_id']);
+    if (!$product) {
+        return response()->json(['error' => 'Product not found.'], 404);
+    }
+    // If product has variants, require variant selection
+    $hasVariants = \App\Models\Variant::where('variant_productId', $product->id)->count() > 0;
+    if ($hasVariants && !$validated['variant_id']) {
+        return response()->json(['error' => 'Please select a variant.'], 422);
+    }
+    // If variant has subvariants, require subvariant selection
+    if ($validated['variant_id']) {
+        $hasSubvariants = \App\Models\VariantSub::where('subvar_variantId', $validated['variant_id'])->count() > 0;
+        if ($hasSubvariants && !$validated['subvariant_id']) {
+            return response()->json(['error' => 'Please select a subvariant.'], 422);
+        }
+    }
+    $userId = auth()->user()->id;
+    // Create a new cart entry for this buy now action
+    $cart = \App\Models\Cart::create([
+        'cart_user' => $userId,
+        'cart_product' => $validated['product_id'],
+        'cart_variant' => $validated['variant_id'],
+        'cart_subVariant' => $validated['subvariant_id'],
+        'cart_quantity' => $validated['quantity'],
+    ]);
+    // Store this cart ID in session for checkout
+    session(['checkout_cart_ids' => [$cart->id]]);
+    return response()->json(['success' => true, 'redirect' => route('checkout.page')]);
+})->middleware(['web', 'auth']);

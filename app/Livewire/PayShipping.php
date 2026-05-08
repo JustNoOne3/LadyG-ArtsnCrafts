@@ -15,6 +15,7 @@ class PayShipping extends Component
 
     public $showModal = false;
     public $showButton = true;
+    public $order;
     public $orderId;
     public $shippingReceipt;
     public $successModal = false;
@@ -32,6 +33,7 @@ class PayShipping extends Component
         $this->showButton = $showButton;
 
         $order = Order::findOrFail($this->orderId);
+        $this->order = $order;
         $this->shippingOption = ShippingOptions::find($order->order_shippingMethod)->value('option_name');
         $this->amount = $order->order_shippingFee;
         $this->paymentDetails = PaymentDetails::all();

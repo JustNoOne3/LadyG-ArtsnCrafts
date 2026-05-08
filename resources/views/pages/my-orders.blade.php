@@ -51,15 +51,29 @@
                                 <tr class="hover:bg-[#faf5f0] transition">
                                     <td class="px-4 py-3 font-mono text-[#7a4025] font-bold">{{ $order->order_reference }}</td>
                                     <td class="px-4 py-3">
+                                        @php
+                                            // Ensure we are working with an array even if the column is null
+                                            $products = is_array($order->order_products) ? $order->order_products : json_decode($order->order_products, true) ?? [];
+                                        @endphp
                                         <ul class="list-disc ml-4 text-sm text-gray-700">
-                                            @foreach($order->order_products as $item)
-                                                <li>
-                                                    <span class="font-medium">{{ $item['product_name'] }}</span>
-                                                    <span class="text-xs text-gray-500 ml-1">x{{ $item['quantity'] }}</span>
-                                                    @if(!empty($item['variant_name']))<span class="text-xs text-gray-400 ml-1">({{ $item['variant_name'] }})</span>@endif
-                                                    @if(!empty($item['subvariant_name']))<span class="text-xs text-gray-400 ml-1">({{ $item['subvariant_name'] }})</span>@endif
-                                                </li>
-                                            @endforeach
+                                            @forelse($products as $item)
+                                                @if(is_array($item))
+                                                    <li>
+                                                        <span class="font-medium">{{ $item['product_name'] ?? 'Unknown Product' }}</span>
+                                                        <span class="text-xs text-gray-500 ml-1">x{{ $item['quantity'] ?? 0 }}</span>
+                                                        
+                                                        @if(!empty($item['variant_name']))
+                                                            <span class="text-xs text-gray-400 ml-1">({{ $item['variant_name'] }})</span>
+                                                        @endif
+                                                        
+                                                        @if(!empty($item['subvariant_name']))
+                                                            <span class="text-xs text-gray-400 ml-1">({{ $item['subvariant_name'] }})</span>
+                                                        @endif
+                                                    </li>
+                                                @endif
+                                            @empty
+                                                <li>No products found.</li>
+                                            @endforelse
                                         </ul>
                                     </td>
                                     <td class="px-4 py-3">

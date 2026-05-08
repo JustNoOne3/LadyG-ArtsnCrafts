@@ -108,7 +108,7 @@
                                 <button onclick="location.reload()" class="bg-[#7a4025] text-white px-6 py-2 rounded hover:bg-[#63321c] font-semibold w-full mt-4">Continue Shopping</button>
                             </div>
                         </div>
-                        <button class="flex items-center gap-4 px-6 py-3 rounded-lg shadow-lg border-2 border-[#7a4025] text-[#7a4025] font-semibold text-sm md:text-lg hover:bg-[#63321c] transition">
+                        <button id="buy-now-btn" type="button" class="flex items-center gap-4 px-6 py-3 rounded-lg shadow-lg border-2 border-[#7a4025] text-[#7a4025] font-semibold text-sm md:text-lg hover:bg-[#63321c] transition">
                             <x-bi-bag-check class="hidden md:block w-6 h-6 text-[#7a4025]" />
                             Buy Now
                         </button>
@@ -129,25 +129,36 @@
     let selectedVariantId = null;
     let selectedSubvariantId = null;
 
+    // Auth status from backend
+    const isLoggedIn = {{ auth()->check() ? 'true' : 'false' }};
+    const loginUrl = '{{ route('login') }}';
+
     function updateAddToCartButton() {
         const btn = document.getElementById('add-to-cart-btn');
-        // If there are subvariants for the selected variant, require both to be selected
+        const buyNowBtn = document.getElementById('buy-now-btn');
+        let canProceed = false;
         if (selectedVariantId) {
             const hasSubvariants = subvariants.some(sv => sv.subvar_variantId == selectedVariantId);
             if (hasSubvariants) {
-                btn.disabled = !selectedSubvariantId;
+                canProceed = !!selectedSubvariantId;
             } else {
-                btn.disabled = false;
+                canProceed = true;
             }
         } else {
-            btn.disabled = true;
+            canProceed = false;
         }
+        btn.disabled = !canProceed;
+        if (buyNowBtn) buyNowBtn.disabled = !canProceed;
     }
 
     // Add to Cart AJAX logic
     document.addEventListener('DOMContentLoaded', function() {
         updateAddToCartButton();
         document.getElementById('add-to-cart-btn').addEventListener('click', function() {
+            if (!isLoggedIn) {
+                window.location.href = loginUrl;
+                return;
+            }
             const productId = {{ $product->id }};
             const variantId = selectedVariantId;
             const subvariantId = selectedSubvariantId;
@@ -177,6 +188,57 @@
                 }
             })
             .catch(() => alert('Failed to add to cart.'));
+        });
+
+        // Buy Now button logic
+        document.getElementById('buy-now-btn').addEventListener('click', function() {
+            if (!isLoggedIn) {
+                window.location.href = loginUrl;
+                return;
+            }
+            // Require variant/subvariant selection
+            let canProceed = false;
+            if (selectedVariantId) {
+                const hasSubvariants = subvariants.some(sv => sv.subvar_variantId == selectedVariantId);
+                if (hasSubvariants) {
+                    canProceed = !!selectedSubvariantId;
+                } else {
+                    canProceed = true;
+                }
+            }
+            if (!canProceed) {
+                alert('Please select a variant' + (subvariants.some(sv => sv.subvar_variantId == selectedVariantId) ? ' and subvariant' : '') + ' before proceeding.');
+                return;
+            }
+            const productId = {{ $product->id }};
+            const variantId = selectedVariantId;
+            const subvariantId = selectedSubvariantId;
+            const quantity = parseInt(document.getElementById('order-qty').value) || 1;
+
+            // Send POST to /buy-now and redirect to checkout
+            fetch('/buy-now', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({
+                    product_id: productId,
+                    variant_id: variantId,
+                    subvariant_id: subvariantId,
+                    quantity: quantity
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success && data.redirect) {
+                    window.location.href = data.redirect;
+                } else {
+                    alert(data.error || 'Failed to proceed to checkout.');
+                }
+            })
+            .catch(() => alert('Failed to proceed to checkout.'));
         });
     });
 
