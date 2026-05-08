@@ -52,14 +52,28 @@
             <div class="hidden md:flex items-center gap-8">
                 @livewire('cart-badge')
                 @if(auth()->user())
-                    <x-filament::icon-button
-                        {{-- class="h-32 w-32" --}}
-                        size="xl"
-                        color="warning"
-                        icon="heroicon-s-user-circle"
-                        wire:click="openNewUserModal"
-                        label="Profile"
-                    />
+                    @php
+                        $avatar = auth()->user()->avatar ?? null;
+                        $avatarUrl = null;
+                        if ($avatar) {
+                            // If avatar is a full URL, use as is; otherwise, treat as storage path
+                            $avatarUrl = Str::startsWith($avatar, ['http://', 'https://']) ? $avatar : asset('storage/' . ltrim($avatar, '/'));
+                        }
+                    @endphp
+                    <a
+                        {{-- type="button"
+                        wire:click="{{}}" --}}
+                        class="flex items-center justify-center w-12 h-12 rounded-full bg-[#e6d9cb] hover:bg-[#d19658] border-2 border-[#e6d9cb] focus:outline-none transition relative"
+                        {{-- title="Profile" --}}
+                    >
+                        @if($avatarUrl)
+                            <img src="{{ $avatarUrl }}" alt="User Avatar" class="w-12 h-12 object-cover rounded-full border-2 border-[#7a4025]" />
+                        @else
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="#7a4025" class="w-12 h-12">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 7.5a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 19.125a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21c-2.676 0-5.216-.584-7.499-1.875z" />
+                            </svg>
+                        @endif
+                    </a>
                 @endif
             </div>
             

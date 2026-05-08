@@ -43,7 +43,7 @@
                     <a v-for="product in products.data" :key="product.id" :href="`/product/${product.id}`"  class="bg-white rounded-lg shadow p-4 flex flex-col items-start hover:shadow-xl transition cursor-pointer">
                         <img :src="product.product_thumbnail_url" :alt="product.product_name" class="w-32 h-44 self-center rounded mb-2">
                         <div class="font-semibold text-base text-left mb-1">{{ product.product_name }}</div>
-                        <div class="text-sm text-gray-600 text-left mb-1">${{ Number(product.product_price).toFixed(2) }}</div>
+                        <div class="text-sm text-gray-600 text-left mb-1">₱{{ Number(product.product_price).toFixed(2) }}</div>
                         <div class="text-xs text-gray-500 text-left mb-1">Sold: {{ product.product_soldCount }}</div>
                     </a>
                     <div v-if="products.data.length === 0" class="col-span-2 md:col-span-5 text-center text-gray-500 py-12">No products found.</div>

@@ -402,3 +402,7 @@ Route::post('/buy-now', function(Request $request) {
     session(['checkout_cart_ids' => [$cart->id]]);
     return response()->json(['success' => true, 'redirect' => route('checkout.page')]);
 })->middleware(['web', 'auth']);
+
+Route::get('/profile', function() {
+    return view('pages.profile');
+})->name('profile')->middleware('auth');

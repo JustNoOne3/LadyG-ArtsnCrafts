@@ -66,20 +66,20 @@
 
                     {{-- Variant Selection --}}
                     @if($variants->count())
-                    <div class="mt-4">
-                        <div class="font-semibold mb-2">Select Variant:</div>
-                        <div class="flex gap-2 flex-wrap">
-                            @foreach($variants as $variant)
-                                <button type="button" class="variant-btn border-2 border-transparent rounded-lg p-1 hover:border-[#8c370f] focus:border-[#8c370f] focus:outline-none"
-                                    style="background: #f7ede3;"
-                                    onclick="selectVariant({{ $variant->id }})"
-                                    id="variant-btn-{{ $variant->id }}">
-                                    <img src="{{ asset('storage/' . $variant->variant_image) }}" alt="{{ $variant->variant_name }}" class="w-12 h-12 object-cover rounded mb-1">
-                                    <div class="text-xs text-[#8c370f]">{{ $variant->variant_name }}</div>
-                                </button>
-                            @endforeach
+                        <div class="mt-4">
+                            <div class="font-semibold mb-2">Select Variant:</div>
+                            <div class="flex gap-2 flex-wrap">
+                                @foreach($variants as $variant)
+                                    <button type="button" class="variant-btn border-2 border-transparent rounded-lg p-1 hover:border-[#8c370f] focus:border-[#8c370f] focus:outline-none"
+                                        style="background: #f7ede3;"
+                                        onclick="selectVariant({{ $variant->id }})"
+                                        id="variant-btn-{{ $variant->id }}">
+                                        <img src="{{ asset('storage/' . $variant->variant_image) }}" alt="{{ $variant->variant_name }}" class="w-12 h-12 object-cover rounded mb-1">
+                                        <div class="text-xs text-[#8c370f]">{{ $variant->variant_name }}</div>
+                                    </button>
+                                @endforeach
+                            </div>
                         </div>
-                    </div>
                     @endif
 
                     {{-- Subvariant Selection --}}
